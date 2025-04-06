@@ -262,6 +262,7 @@ erDiagram
         DATE studied_at "Data do estudo"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 
     SCHEDULED_REVIEWS {
@@ -274,6 +275,7 @@ erDiagram
         TIMESTAMP completed_at "Data e hora da conclusão da revisão"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 
     PLAN_TOPIC_LINKS {
@@ -284,6 +286,7 @@ erDiagram
         TEXT url "Endereço do link"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 
     STUDY_CYCLES {
@@ -304,6 +307,7 @@ erDiagram
         INTEGER target_minutes "Minutos alvo para essa disciplina"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 
     SIMULATED_EXAMS {
@@ -316,6 +320,7 @@ erDiagram
         DATE simulated_at "Data em que o simulado foi realizado"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 
     EXAM_STYLES {
@@ -323,6 +328,7 @@ erDiagram
         TEXT name "Nome do estilo (Múltipla Escolha, Certo/Errado)"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 
     SIMULATED_EXAM_DISCIPLINES {
@@ -337,5 +343,6 @@ erDiagram
         TEXT comment "Comentário sobre a disciplina no simulado"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 ```
