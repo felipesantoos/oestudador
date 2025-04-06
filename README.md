@@ -29,6 +29,9 @@ erDiagram
     STUDY_CATEGORIES ||--o{ STUDY_RECORDS : categorizes
     PLAN_TOPICS ||--o{ PLAN_TOPIC_LINKS : has
     PLAN_TOPIC_LINKS }o--|| PLAN_TOPICS : belongs_to
+    USERS ||--o{ STUDY_CYCLES : owns
+    STUDY_CYCLES ||--o{ STUDY_CYCLE_DISCIPLINES : includes
+    DISCIPLINES ||--o{ STUDY_CYCLE_DISCIPLINES : defined_by
 
     USERS {
         UUID id PK "Identificador único"
@@ -272,6 +275,26 @@ erDiagram
         UUID topic_id FK "Tópico associado"
         TEXT title "Título do link"
         TEXT url "Endereço do link"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+    }
+
+    STUDY_CYCLES {
+        UUID id PK "Identificador único do ciclo"
+        UUID user_id FK "Usuário dono do ciclo"
+        TEXT name "Nome do ciclo de estudos"
+        TEXT description "Descrição opcional"
+        BOOLEAN is_active "Se está em uso atualmente"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
+    STUDY_CYCLE_DISCIPLINES {
+        UUID id PK "Identificador único"
+        UUID study_cycle_id FK "Ciclo de estudo associado"
+        UUID discipline_id FK "Disciplina associada"
+        INTEGER target_minutes "Minutos alvo para essa disciplina"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
     }
