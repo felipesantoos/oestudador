@@ -27,6 +27,8 @@ erDiagram
     PLAN_TOPICS ||--o{ STUDY_RECORDS : has
     PLAN_TOPICS ||--o{ SCHEDULED_REVIEWS : has
     STUDY_CATEGORIES ||--o{ STUDY_RECORDS : categorizes
+    PLAN_TOPICS ||--o{ PLAN_TOPIC_LINKS : has
+    PLAN_TOPIC_LINKS }o--|| PLAN_TOPICS : belongs_to
 
     USERS {
         UUID id PK "Identificador único"
@@ -259,6 +261,16 @@ erDiagram
         UUID plan_id FK "Plano de estudo associado UNIQUE(plan_id, topic_id, scheduled_date)"
         UUID topic_id FK "Tópico associado UNIQUE(plan_id, topic_id, scheduled_date)"
         DATE scheduled_date "Data planejada para revisão UNIQUE(plan_id, topic_id, scheduled_date)"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+    }
+
+    PLAN_TOPIC_LINKS {
+        UUID id PK "Identificador único do link"
+        UUID plan_id FK "Plano associado"
+        UUID topic_id FK "Tópico associado"
+        TEXT title "Título do link"
+        TEXT url "Endereço do link"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
     }
