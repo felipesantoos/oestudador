@@ -265,6 +265,9 @@ erDiagram
         UUID plan_id FK "Plano de estudo associado UNIQUE(plan_id, topic_id, scheduled_date)"
         UUID topic_id FK "Tópico associado UNIQUE(plan_id, topic_id, scheduled_date)"
         DATE scheduled_date "Data planejada para revisão UNIQUE(plan_id, topic_id, scheduled_date)"
+        BOOLEAN completed "Se a revisão foi feita"
+        BOOLEAN ignored "Se a revisão foi ignorada"
+        TIMESTAMP completed_at "Data e hora da conclusão da revisão"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
     }
