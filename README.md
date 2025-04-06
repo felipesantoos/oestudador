@@ -39,6 +39,22 @@ erDiagram
     RESOURCE_TYPES ||--o{ PLAN_TOPIC_RESOURCES : defines
     PLAN_TOPICS ||--o{ PLAN_TOPIC_RESOURCES : has
     PLAN_TOPICS ||--o{ PLAN_TOPIC_REVIEWS : has
+    USERS ||--o{ STUDY_GOALS : has
+    STUDY_GOAL_TYPES ||--o{ STUDY_GOALS : defines
+    STUDY_PERIODS ||--o{ STUDY_GOALS : defines
+    USERS ||--o{ STUDY_NOTES : writes
+    USERS ||--o{ STUDY_MOOD_TRACKING : records
+    STUDY_RECORDS ||--o{ STUDY_MOOD_TRACKING : tracks
+    MOOD_TYPES ||--o{ STUDY_MOOD_TRACKING : has
+    ENERGY_LEVELS ||--o{ STUDY_MOOD_TRACKING : has
+    USERS ||--o{ USER_ACHIEVEMENTS : earns
+    ACHIEVEMENTS ||--o{ USER_ACHIEVEMENTS : achieved
+    USERS ||--o{ PROGRESS_LOGS : has
+    USERS ||--o{ PLAN_PROJECTIONS : owns
+    PLANS ||--o{ PLAN_PROJECTIONS : projected_for
+    TOPICS ||--o{ TOPIC_RELATIONS : origin
+    TOPICS ||--o{ TOPIC_RELATIONS : target
+    TOPIC_RELATION_TYPES ||--o{ TOPIC_RELATIONS : defines
 
     USERS {
         UUID id PK "Identificador único"
@@ -381,5 +397,120 @@ erDiagram
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
         TIMESTAMP deleted_at "Soft delete"
+    }
+
+    STUDY_GOALS {
+        UUID id PK
+        UUID user_id FK
+        UUID plan_id FK
+        UUID goal_type_id FK
+        UUID period_id FK
+        INTEGER target
+        TIMESTAMP start_date
+        TIMESTAMP end_date
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
+    }
+
+    STUDY_GOAL_TYPES {
+        UUID id PK
+        TEXT name "Ex: tempo, tópicos, revisões"
+        TEXT description
+        TIMESTAMP created_at
+    }
+
+    STUDY_PERIODS {
+        UUID id PK
+        TEXT name "Ex: diário, semanal, mensal"
+        TEXT description
+        TIMESTAMP created_at
+    }
+
+    STUDY_NOTES {
+        UUID id PK
+        UUID user_id FK
+        DATE date
+        TEXT note
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    STUDY_MOOD_TRACKING {
+        UUID id PK
+        UUID user_id FK
+        UUID study_record_id FK
+        UUID mood_id FK
+        UUID energy_level_id FK
+        TEXT notes
+        TIMESTAMP created_at
+    }
+
+    MOOD_TYPES {
+        UUID id PK
+        TEXT name "Ex: motivado, cansado, animado"
+        TEXT emoji
+        TIMESTAMP created_at
+    }
+
+    ENERGY_LEVELS {
+        UUID id PK
+        INTEGER value "0 a 10"
+        TEXT description
+        TIMESTAMP created_at
+    }
+
+    ACHIEVEMENTS {
+        UUID id PK
+        TEXT name "Ex: 7 dias seguidos"
+        TEXT description
+        TEXT icon
+        TIMESTAMP created_at
+    }
+
+    USER_ACHIEVEMENTS {
+        UUID id PK
+        UUID user_id FK
+        UUID achievement_id FK
+        TIMESTAMP achieved_at
+    }
+
+    PROGRESS_LOGS {
+        UUID id PK
+        UUID user_id FK
+        UUID plan_id FK
+        DATE date
+        INTEGER total_minutes
+        INTEGER topics_completed
+        INTEGER reviews_completed
+        INTEGER questions_correct
+        INTEGER questions_wrong
+        TIMESTAMP created_at
+    }
+
+    PLAN_PROJECTIONS {
+        UUID id PK
+        UUID user_id FK
+        UUID plan_id FK
+        DATE projected_completion
+        FLOAT confidence
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    TOPIC_RELATIONS {
+        UUID id PK
+        UUID topic_id FK
+        UUID related_topic_id FK
+        UUID relation_type_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    TOPIC_RELATION_TYPES {
+        UUID id PK
+        TEXT name "Ex: prerequisite, complementary"
+        TEXT description
+        TIMESTAMP created_at
     }
 ```
