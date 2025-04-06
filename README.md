@@ -1,8 +1,11 @@
 ```mermaid
 erDiagram
     USERS ||--o{ PLANS : has
+    USERS ||--o{ PLAN_TEMPLATES : created
     OBJECTIVES ||--o{ PLANS : includes
+    OBJECTIVES ||--o{ PLAN_TEMPLATES : includes
     PLAN_STATUSES ||--o{ PLANS : defines
+    PLAN_STATUSES ||--o{ PLAN_TEMPLATES : defines
     PLANS ||--o{ PLAN_EXAMS : includes
     EXAMS ||--o{ PLAN_EXAMS : included_by
     PLANS ||--o{ PLAN_ROLES : linked_to
@@ -136,6 +139,22 @@ erDiagram
         BOOLEAN is_active "Se o tópico está ativo"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
+    PLAN_TEMPLATES {
+        UUID id PK "Identificador único do template"
+        UUID created_by FK "Usuário criador (admin, moderador...)"
+        UUID objective_id FK "Objetivo do plano"
+        UUID plan_status_id FK "Status do template (ex: published, draft)"
+        TEXT name "Nome do plano modelo"
+        TEXT description "Descrição opcional"
+        TEXT image_url "Imagem ilustrativa"
+        INTEGER weekly_hours "Carga horária semanal sugerida"
+        BOOLEAN review_enabled "Se recomenda revisão espaçada"
+        INTEGER[] review_intervals "Intervalos de revisão sugeridos"
+        TIMESTAMP created_at "Data de criação"
+        TIMESTAMP updated_at "Última atualização"
         TIMESTAMP deleted_at "Soft delete"
     }
 ```
