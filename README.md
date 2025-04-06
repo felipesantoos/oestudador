@@ -38,6 +38,7 @@ erDiagram
     DISCIPLINES ||--o{ SIMULATED_EXAM_DISCIPLINES : included
     RESOURCE_TYPES ||--o{ PLAN_TOPIC_RESOURCES : defines
     PLAN_TOPICS ||--o{ PLAN_TOPIC_RESOURCES : has
+    PLAN_TOPICS ||--o{ PLAN_TOPIC_REVIEWS : has
 
     USERS {
         UUID id PK "Identificador único"
@@ -363,6 +364,20 @@ erDiagram
         TEXT url "URL ou caminho do arquivo (PDF, imagem, vídeo, etc)"
         TEXT content "Conteúdo textual (usado por resumos, flashcards, etc)"
         INTEGER order "Ordem de exibição"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
+    PLAN_TOPIC_REVIEWS {
+        UUID id PK "Identificador único"
+        UUID plan_id FK "Plano associado"
+        UUID topic_id FK "Tópico associado"
+        DATE last_reviewed_at "Data da última revisão"
+        DATE next_review_at "Data da próxima revisão"
+        INTEGER repetitions "Repetições corretas consecutivas"
+        FLOAT easiness_factor "Fator de facilidade"
+        INTEGER interval "Intervalo (em dias)"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
         TIMESTAMP deleted_at "Soft delete"
