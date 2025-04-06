@@ -8,10 +8,16 @@ erDiagram
     PLAN_STATUSES ||--o{ PLAN_TEMPLATES : defines
     PLANS ||--o{ PLAN_EXAMS : includes
     EXAMS ||--o{ PLAN_EXAMS : included_by
+    PLAN_TEMPLATES ||--o{ PLAN_TEMPLATE_EXAMS : includes
+    EXAMS ||--o{ PLAN_TEMPLATE_EXAMS : included_by
     PLANS ||--o{ PLAN_ROLES : linked_to
     ROLES ||--o{ PLAN_ROLES : contains
+    PLAN_TEMPLATES ||--o{ PLAN_TEMPLATE_ROLES : linked_to
+    ROLES ||--o{ PLAN_TEMPLATE_ROLES : contains
     PLANS ||--o{ PLAN_DISCIPLINES : has
+    PLAN_TEMPLATES ||--o{ PLAN_TEMPLATE_DISCIPLINES : has
     DISCIPLINES ||--o{ PLAN_DISCIPLINES : defines
+    DISCIPLINES ||--o{ PLAN_TEMPLATE_DISCIPLINES : defines
     DISCIPLINES ||--o{ TOPICS : contains
 
     USERS {
@@ -60,6 +66,22 @@ erDiagram
         TIMESTAMP deleted_at "Deleção lógica (soft delete)"
     }
 
+    PLAN_TEMPLATES {
+        UUID id PK "Identificador único do template"
+        UUID created_by FK "Usuário criador (admin, moderador...)"
+        UUID objective_id FK "Objetivo do plano"
+        UUID plan_status_id FK "Status do template (ex: published, draft)"
+        TEXT name "Nome do plano modelo"
+        TEXT description "Descrição opcional"
+        TEXT image_url "Imagem ilustrativa"
+        INTEGER weekly_hours "Carga horária semanal sugerida"
+        BOOLEAN review_enabled "Se recomenda revisão espaçada"
+        INTEGER[] review_intervals "Intervalos de revisão sugeridos"
+        TIMESTAMP created_at "Data de criação"
+        TIMESTAMP updated_at "Última atualização"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
     OBJECTIVES {
         UUID id PK "Identificador único"
         TEXT name "Nome do objetivo (ex: ENEM)"
@@ -96,6 +118,12 @@ erDiagram
         TIMESTAMP created_at "Data da associação"
     }
 
+    PLAN_TEMPLATE_EXAMS {
+        UUID plan_template_id FK "Template associado"
+        UUID exam_id FK "Edital associado"
+        TIMESTAMP created_at "Data da associação"
+    }
+
     ROLES {
         UUID id PK "Identificador único"
         TEXT name "Nome do cargo"
@@ -108,6 +136,12 @@ erDiagram
 
     PLAN_ROLES {
         UUID plan_id FK "Plano associado"
+        UUID role_id FK "Cargo associado"
+        TIMESTAMP created_at "Data da associação"
+    }
+
+    PLAN_TEMPLATE_ROLES {
+        UUID plan_template_id FK "Template associado"
         UUID role_id FK "Cargo associado"
         TIMESTAMP created_at "Data da associação"
     }
@@ -131,6 +165,15 @@ erDiagram
         TIMESTAMP created_at "Data da associação"
     }
 
+    PLAN_TEMPLATE_DISCIPLINES {
+        UUID plan_template_id FK "Template associado"
+        UUID discipline_id FK "Disciplina associada"
+        INTEGER percentage "Porcentagem sugerida"
+        INTEGER weekly_hours "Horas semanais sugeridas"
+        TEXT color "Cor sugerida"
+        TIMESTAMP created_at "Data da associação"
+    }
+
     TOPICS {
         UUID id PK "Identificador único"
         UUID discipline_id FK "Disciplina associada"
@@ -139,22 +182,6 @@ erDiagram
         BOOLEAN is_active "Se o tópico está ativo"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
-        TIMESTAMP deleted_at "Soft delete"
-    }
-
-    PLAN_TEMPLATES {
-        UUID id PK "Identificador único do template"
-        UUID created_by FK "Usuário criador (admin, moderador...)"
-        UUID objective_id FK "Objetivo do plano"
-        UUID plan_status_id FK "Status do template (ex: published, draft)"
-        TEXT name "Nome do plano modelo"
-        TEXT description "Descrição opcional"
-        TEXT image_url "Imagem ilustrativa"
-        INTEGER weekly_hours "Carga horária semanal sugerida"
-        BOOLEAN review_enabled "Se recomenda revisão espaçada"
-        INTEGER[] review_intervals "Intervalos de revisão sugeridos"
-        TIMESTAMP created_at "Data de criação"
-        TIMESTAMP updated_at "Última atualização"
         TIMESTAMP deleted_at "Soft delete"
     }
 ```
