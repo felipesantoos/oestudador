@@ -5,6 +5,8 @@ erDiagram
     PLAN_STATUSES ||--o{ PLANS : defines
     PLANS ||--o{ PLAN_EXAMS : includes
     EXAMS ||--o{ PLAN_EXAMS : included_by
+    PLANS ||--o{ PLAN_ROLES : linked_to
+    ROLES ||--o{ PLAN_ROLES : contains
 
     USERS {
         UUID id PK "Identificador único"
@@ -85,6 +87,22 @@ erDiagram
     PLAN_EXAMS {
         UUID plan_id FK "Plano associado"
         UUID exam_id FK "Edital associado"
+        TIMESTAMP created_at "Data da associação"
+    }
+
+    ROLES {
+        UUID id PK "Identificador único"
+        TEXT name "Nome do cargo"
+        TEXT description "Descrição opcional do cargo"
+        BOOLEAN is_active "Se o cargo está ativo no sistema"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
+    PLAN_ROLES {
+        UUID plan_id FK "Plano associado"
+        UUID role_id FK "Cargo associado"
         TIMESTAMP created_at "Data da associação"
     }
 ```
