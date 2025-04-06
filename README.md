@@ -32,6 +32,10 @@ erDiagram
     USERS ||--o{ STUDY_CYCLES : owns
     STUDY_CYCLES ||--o{ STUDY_CYCLE_DISCIPLINES : includes
     DISCIPLINES ||--o{ STUDY_CYCLE_DISCIPLINES : defined_by
+    PLANS ||--o{ SIMULATED_EXAMS : has
+    EXAM_STYLES ||--o{ SIMULATED_EXAMS : defines
+    SIMULATED_EXAMS ||--o{ SIMULATED_EXAM_DISCIPLINES : includes
+    DISCIPLINES ||--o{ SIMULATED_EXAM_DISCIPLINES : included
 
     USERS {
         UUID id PK "Identificador único"
@@ -298,6 +302,39 @@ erDiagram
         UUID study_cycle_id FK "Ciclo de estudo associado"
         UUID discipline_id FK "Disciplina associada"
         INTEGER target_minutes "Minutos alvo para essa disciplina"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+    }
+
+    SIMULATED_EXAMS {
+        UUID id PK "Identificador único"
+        UUID plan_id FK "Plano associado ao simulado"
+        UUID exam_style_id FK "Estilo da prova (múltipla escolha ou certo/errado)"
+        TEXT name "Nome do simulado"
+        TEXT board "Banca do simulado"
+        TIME time_spent "Tempo total gasto no simulado"
+        DATE simulated_at "Data em que o simulado foi realizado"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+    }
+
+    EXAM_STYLES {
+        UUID id PK "Identificador único"
+        TEXT name "Nome do estilo (Múltipla Escolha, Certo/Errado)"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+    }
+
+    SIMULATED_EXAM_DISCIPLINES {
+        UUID id PK "Identificador único"
+        UUID simulated_exam_id FK "Simulado associado"
+        UUID discipline_id FK "Disciplina associada"
+        INTEGER weight "Peso da disciplina no simulado"
+        INTEGER total_questions "Total de questões"
+        INTEGER correct_answers "Quantidade de acertos"
+        INTEGER wrong_answers "Quantidade de erros"
+        INTEGER blank_answers "Deixadas em branco (apenas para Certo/Errado)"
+        TEXT comment "Comentário sobre a disciplina no simulado"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
     }
