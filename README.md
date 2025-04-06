@@ -2,6 +2,7 @@
 erDiagram
     USERS ||--o{ PLANS : has
     USERS ||--o{ PLAN_TEMPLATES : created
+    USERS ||--o{ DISCIPLINE_TEMPLATES : created
     OBJECTIVES ||--o{ PLANS : includes
     OBJECTIVES ||--o{ PLAN_TEMPLATES : includes
     PLAN_STATUSES ||--o{ PLANS : defines
@@ -19,9 +20,10 @@ erDiagram
     DISCIPLINES ||--o{ PLAN_DISCIPLINES : defines
     DISCIPLINES ||--o{ PLAN_TEMPLATE_DISCIPLINES : defines
     DISCIPLINES ||--o{ TOPICS : contains
-    PLANS ||--o{ PLAN_TOPICS : includes
-    TOPICS ||--o{ PLAN_TOPICS : used_in
-    PLAN_TOPICS ||--|| PLAN_TOPIC_PROGRESS : tracks
+    DISCIPLINE_TEMPLATES ||--o{ PLAN_TEMPLATE_DISCIPLINES : defines
+    DISCIPLINE_TEMPLATES ||--o{ TOPIC_TEMPLATES : contains
+    PLANS ||--o{ PLAN_TOPICS : has
+    TOPICS ||--o{ PLAN_TOPICS : defines
 
     USERS {
         UUID id PK "Identificador único"
@@ -171,6 +173,7 @@ erDiagram
     PLAN_TEMPLATE_DISCIPLINES {
         UUID plan_template_id FK "Template associado"
         UUID discipline_id FK "Disciplina associada"
+        UUID discipline_template_id FK "Disciplina modelo associada"
         INTEGER percentage "Porcentagem sugerida"
         INTEGER weekly_hours "Horas semanais sugeridas"
         TEXT color "Cor sugerida"
@@ -191,17 +194,31 @@ erDiagram
     PLAN_TOPICS {
         UUID plan_id FK "Plano associado"
         UUID topic_id FK "Tópico associado"
-        BOOLEAN is_active "Tópico está incluído no plano?"
-        INTEGER sort_order "Ordem personalizada"
-        TEXT custom_label "Nome customizado (opcional)"
+        BOOLEAN completed "Se o tópico foi concluído"
         TIMESTAMP created_at "Data da associação"
+        TIMESTAMP updated_at "Última atualização"
     }
 
-    PLAN_TOPIC_PROGRESS {
-        UUID plan_id FK "Plano associado"
-        UUID topic_id FK "Tópico associado"
-        BOOLEAN is_completed "Se o tópico foi concluído"
-        TIMESTAMP completed_at "Data de conclusão"
-        TIMESTAMP updated_at "Última atualização"
+    DISCIPLINE_TEMPLATES {
+        UUID id PK "Identificador único"
+        UUID created_by FK "Criado por (usuário ou admin)"
+        TEXT name "Nome da disciplina modelo"
+        TEXT description "Descrição da disciplina modelo"
+        TEXT color "Cor sugerida"
+        BOOLEAN is_active "Se está ativa"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
+    TOPIC_TEMPLATES {
+        UUID id PK "Identificador único"
+        UUID discipline_template_id FK "Disciplina modelo associada"
+        TEXT name "Nome do tópico modelo"
+        TEXT description "Descrição do tópico"
+        BOOLEAN is_active "Se está ativo"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 ```
