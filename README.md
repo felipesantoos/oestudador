@@ -36,6 +36,8 @@ erDiagram
     EXAM_STYLES ||--o{ SIMULATED_EXAMS : defines
     SIMULATED_EXAMS ||--o{ SIMULATED_EXAM_DISCIPLINES : includes
     DISCIPLINES ||--o{ SIMULATED_EXAM_DISCIPLINES : included
+    RESOURCE_TYPES ||--o{ PLAN_TOPIC_RESOURCES : defines
+    PLAN_TOPICS ||--o{ PLAN_TOPIC_RESOURCES : has
 
     USERS {
         UUID id PK "Identificador único"
@@ -77,6 +79,7 @@ erDiagram
         DATE end_date "Data de término (opcional)"
         INTEGER weekly_hours "Horas disponíveis por semana"
         BOOLEAN review_enabled "Revisão espaçada está habilitada?"
+        INTEGER[] review_intervals "Intervalos de revisão (1,7,15...)"
         TIMESTAMP created_at "Data de criação do plano"
         TIMESTAMP updated_at "Última atualização"
         TIMESTAMP deleted_at "Deleção lógica (soft delete)"
@@ -92,6 +95,7 @@ erDiagram
         TEXT image_url "Imagem ilustrativa"
         INTEGER weekly_hours "Carga horária semanal sugerida"
         BOOLEAN review_enabled "Se recomenda revisão espaçada"
+        INTEGER[] review_intervals "Intervalos de revisão sugeridos"
         TIMESTAMP created_at "Data de criação"
         TIMESTAMP updated_at "Última atualização"
         TIMESTAMP deleted_at "Soft delete"
@@ -260,7 +264,6 @@ erDiagram
         DATE studied_at "Data do estudo"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
-        TIMESTAMP deleted_at "Soft delete"
     }
 
     SCHEDULED_REVIEWS {
@@ -273,7 +276,6 @@ erDiagram
         TIMESTAMP completed_at "Data e hora da conclusão da revisão"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
-        TIMESTAMP deleted_at "Soft delete"
     }
 
     PLAN_TOPIC_LINKS {
@@ -284,7 +286,6 @@ erDiagram
         TEXT url "Endereço do link"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
-        TIMESTAMP deleted_at "Soft delete"
     }
 
     STUDY_CYCLES {
@@ -305,7 +306,6 @@ erDiagram
         INTEGER target_minutes "Minutos alvo para essa disciplina"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
-        TIMESTAMP deleted_at "Soft delete"
     }
 
     SIMULATED_EXAMS {
@@ -318,7 +318,6 @@ erDiagram
         DATE simulated_at "Data em que o simulado foi realizado"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
-        TIMESTAMP deleted_at "Soft delete"
     }
 
     EXAM_STYLES {
@@ -326,7 +325,6 @@ erDiagram
         TEXT name "Nome do estilo (Múltipla Escolha, Certo/Errado)"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
-        TIMESTAMP deleted_at "Soft delete"
     }
 
     SIMULATED_EXAM_DISCIPLINES {
@@ -339,6 +337,32 @@ erDiagram
         INTEGER wrong_answers "Quantidade de erros"
         INTEGER blank_answers "Deixadas em branco (apenas para Certo/Errado)"
         TEXT comment "Comentário sobre a disciplina no simulado"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+    }
+
+    RESOURCE_TYPES {
+        UUID id PK "Identificador único"
+        TEXT name "Nome do tipo de recurso (ex: resumo, imagem, PDF, link)"
+        TEXT description "Descrição opcional do tipo"
+        TEXT icon "Nome do ícone ou caminho"
+        TEXT color "Cor associada ao tipo (ex: #FFD700)"
+        BOOLEAN is_active "Se o tipo está ativo para uso"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
+    PLAN_TOPIC_RESOURCES {
+        UUID id PK "Identificador único"
+        UUID plan_id FK "Plano de estudo associado"
+        UUID topic_id FK "Tópico associado"
+        UUID resource_type_id FK "Tipo do recurso"
+        TEXT title "Título do recurso"
+        TEXT description "Descrição opcional"
+        TEXT url "URL ou caminho do arquivo (PDF, imagem, vídeo, etc)"
+        TEXT content "Conteúdo textual (usado por resumos, flashcards, etc)"
+        INTEGER order "Ordem de exibição"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
         TIMESTAMP deleted_at "Soft delete"
