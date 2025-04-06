@@ -24,6 +24,9 @@ erDiagram
     DISCIPLINE_TEMPLATES ||--o{ TOPIC_TEMPLATES : contains
     PLANS ||--o{ PLAN_TOPICS : has
     TOPICS ||--o{ PLAN_TOPICS : defines
+    PLAN_TOPICS ||--o{ STUDY_RECORDS : has
+    PLAN_TOPICS ||--o{ SCHEDULED_REVIEWS : has
+    STUDY_CATEGORIES ||--o{ STUDY_RECORDS : categorizes
 
     USERS {
         UUID id PK "Identificador único"
@@ -220,5 +223,43 @@ erDiagram
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
         TIMESTAMP deleted_at "Soft delete"
+    }
+
+    STUDY_CATEGORIES {
+        UUID id PK "Identificador único"
+        TEXT name "Nome da categoria (teoria, revisão, questões)"
+        TEXT description "Descrição opcional"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
+    STUDY_RECORDS {
+        UUID id PK "Identificador único"
+        UUID plan_topic_id FK "Referência ao plano + tópico"
+        UUID study_category_id FK "Categoria do estudo"
+        TIME study_time "Tempo de estudo (hh:mm:ss)"
+        TEXT material "Material utilizado"
+        BOOLEAN completed "Se o tópico foi concluído neste estudo"
+        BOOLEAN schedule_reviews "Deseja agendar revisões?"
+        INTEGER questions_right "Questões certas (opcional)"
+        INTEGER questions_wrong "Questões erradas (opcional)"
+        INTEGER start_page "Página inicial (opcional)"
+        INTEGER end_page "Página final (opcional)"
+        TEXT video_name "Nome da videoaula (opcional)"
+        TIME video_start_time "Timestamp inicial do vídeo"
+        TIME video_end_time "Timestamp final do vídeo"
+        DATE studied_at "Data do estudo"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+    }
+
+    SCHEDULED_REVIEWS {
+        UUID id PK "Identificador único"
+        UUID plan_id FK "Plano de estudo associado UNIQUE(plan_id, topic_id, scheduled_date)"
+        UUID topic_id FK "Tópico associado UNIQUE(plan_id, topic_id, scheduled_date)"
+        DATE scheduled_date "Data planejada para revisão UNIQUE(plan_id, topic_id, scheduled_date)"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
     }
 ```
