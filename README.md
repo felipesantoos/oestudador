@@ -1,3 +1,4 @@
+```mermaid
 erDiagram
     USERS ||--o{ PLANS : has
     OBJECTIVES ||--o{ PLANS : includes
@@ -66,3 +67,5 @@ erDiagram
         TIMESTAMP updated_at "Atualizado em"
         TIMESTAMP deleted_at "Soft delete"
     }
+
+```
