@@ -19,6 +19,9 @@ erDiagram
     DISCIPLINES ||--o{ PLAN_DISCIPLINES : defines
     DISCIPLINES ||--o{ PLAN_TEMPLATE_DISCIPLINES : defines
     DISCIPLINES ||--o{ TOPICS : contains
+    PLANS ||--o{ PLAN_TOPICS : includes
+    TOPICS ||--o{ PLAN_TOPICS : used_in
+    PLAN_TOPICS ||--|| PLAN_TOPIC_PROGRESS : tracks
 
     USERS {
         UUID id PK "Identificador único"
@@ -183,5 +186,22 @@ erDiagram
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
         TIMESTAMP deleted_at "Soft delete"
+    }
+
+    PLAN_TOPICS {
+        UUID plan_id FK "Plano associado"
+        UUID topic_id FK "Tópico associado"
+        BOOLEAN is_active "Tópico está incluído no plano?"
+        INTEGER sort_order "Ordem personalizada"
+        TEXT custom_label "Nome customizado (opcional)"
+        TIMESTAMP created_at "Data da associação"
+    }
+
+    PLAN_TOPIC_PROGRESS {
+        UUID plan_id FK "Plano associado"
+        UUID topic_id FK "Tópico associado"
+        BOOLEAN is_completed "Se o tópico foi concluído"
+        TIMESTAMP completed_at "Data de conclusão"
+        TIMESTAMP updated_at "Última atualização"
     }
 ```
