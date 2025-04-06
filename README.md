@@ -251,6 +251,7 @@ erDiagram
         TEXT video_name "Nome da videoaula (opcional)"
         TIME video_start_time "Timestamp inicial do vídeo"
         TIME video_end_time "Timestamp final do vídeo"
+        TEXT comment "Comentário livre sobre o estudo"
         DATE studied_at "Data do estudo"
         TIMESTAMP created_at "Criado em"
         TIMESTAMP updated_at "Atualizado em"
