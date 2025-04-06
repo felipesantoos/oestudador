@@ -9,6 +9,7 @@ erDiagram
     ROLES ||--o{ PLAN_ROLES : contains
     PLANS ||--o{ PLAN_DISCIPLINES : has
     DISCIPLINES ||--o{ PLAN_DISCIPLINES : defines
+    DISCIPLINES ||--o{ TOPICS : contains
 
     USERS {
         UUID id PK "Identificador único"
@@ -125,5 +126,16 @@ erDiagram
         INTEGER weekly_hours "Horas semanais (opcional)"
         TEXT color "Cor para representar a disciplina"
         TIMESTAMP created_at "Data da associação"
+    }
+
+    TOPICS {
+        UUID id PK "Identificador único"
+        UUID discipline_id FK "Disciplina associada"
+        TEXT name "Nome do tópico"
+        TEXT description "Descrição do tópico"
+        BOOLEAN is_active "Se o tópico está ativo"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
     }
 ```
