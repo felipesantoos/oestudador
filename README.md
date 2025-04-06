@@ -7,6 +7,8 @@ erDiagram
     EXAMS ||--o{ PLAN_EXAMS : included_by
     PLANS ||--o{ PLAN_ROLES : linked_to
     ROLES ||--o{ PLAN_ROLES : contains
+    PLANS ||--o{ PLAN_DISCIPLINES : has
+    DISCIPLINES ||--o{ PLAN_DISCIPLINES : defines
 
     USERS {
         UUID id PK "Identificador único"
@@ -103,6 +105,25 @@ erDiagram
     PLAN_ROLES {
         UUID plan_id FK "Plano associado"
         UUID role_id FK "Cargo associado"
+        TIMESTAMP created_at "Data da associação"
+    }
+
+    DISCIPLINES {
+        UUID id PK "Identificador único"
+        TEXT name "Nome da disciplina"
+        TEXT description "Descrição opcional da disciplina"
+        BOOLEAN is_active "Se está ativa no sistema"
+        TIMESTAMP created_at "Criado em"
+        TIMESTAMP updated_at "Atualizado em"
+        TIMESTAMP deleted_at "Soft delete"
+    }
+
+    PLAN_DISCIPLINES {
+        UUID plan_id FK "Plano associado"
+        UUID discipline_id FK "Disciplina associada"
+        INTEGER percentage "Porcentagem da carga horária (opcional)"
+        INTEGER weekly_hours "Horas semanais (opcional)"
+        TEXT color "Cor para representar a disciplina"
         TIMESTAMP created_at "Data da associação"
     }
 ```
