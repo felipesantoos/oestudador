@@ -1,0 +1,21 @@
+- app
+    - api
+        - routes
+        - handlers
+            - dtos
+                - request
+                - response
+        - middlewares
+- core
+    - domains
+    - interfaces
+        - primary
+        - secondary
+    - services
+        - filters
+- infra
+    - repository
+        - postgres
+            - dtos
+                - request
+                - response

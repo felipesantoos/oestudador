@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  oestudador-db:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.postgres
+    container_name: oestudador-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: oestudador
+      POSTGRES_USER: oestudador
+      POSTGRES_PASSWORD: oestudador_pass
+    volumes:
+      - oestudador-data:/var/lib/postgresql/data
+
+volumes:
+  oestudador-data:

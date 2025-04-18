@@ -1,0 +1,12 @@
+# Use the official Postgres image as base
+FROM postgres:15
+
+# Default database and user for "oestudador"
+ENV POSTGRES_DB=oestudador
+ENV POSTGRES_USER=oestudador
+ENV POSTGRES_PASSWORD=oestudador_pass
+
+# Copy your full SQL schema into the init folder.
+COPY ../db/schema.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 5432
