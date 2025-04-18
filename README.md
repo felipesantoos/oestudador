@@ -78,6 +78,21 @@ erDiagram
     USERS ||--o{ FAVORITE_RESOURCES : marks
     PLAN_TOPIC_RESOURCES ||--o{ FAVORITE_RESOURCES : is_favorite
     USERS ||--o{ STUDY_ASSISTANT_MESSAGES : receives
+    USERS ||--o{ NOTE_TYPES : defines
+    NOTE_TYPES ||--o{ NOTES : defines
+    USERS ||--o{ NOTES : owns
+    NOTES ||--o{ NOTE_FIELDS : has
+    NOTE_TYPES ||--o{ NOTE_FIELDS : defines
+    NOTES ||--o{ CARD_INSTANCES : generates
+    CARD_INSTANCES ||--o{ CARD_REVIEWS : logs
+    USERS ||--o{ CARD_REVIEWS : performs
+    USERS ||--o{ MEDIA_FILES : uploads
+    USERS ||--o{ SYNC_LOGS : logs
+    USERS ||--o{ ADDONS : installs
+    USERS ||--o{ SETTINGS : owns
+    SCHEDULERS ||--o{ SETTINGS : chooses
+    NOTES ||--o{ CARD_TAGS : tagged
+    TAGS ||--o{ CARD_TAGS : defines
 
     USERS {
         UUID id PK "Identificador único"
@@ -682,5 +697,116 @@ erDiagram
         TEXT message
         TEXT action_url
         TIMESTAMP created_at
+    }
+
+    NOTE_TYPES {
+      UUID id PK "Identificador único do tipo de nota"
+      UUID user_id FK "Usuário proprietário do tipo"
+      TEXT name "Nome do tipo de nota"
+      BOOLEAN is_cloze "Indica se é nota de lacuna (cloze)"
+      TEXT template_front "Template HTML da frente"
+      TEXT template_back "Template HTML do verso"
+      TEXT css "CSS customizado para a nota"
+      TIMESTAMP created_at "Data de criação"
+      TIMESTAMP updated_at "Data de atualização"
+      TIMESTAMP deleted_at "Data de exclusão lógica"
+    }
+
+    NOTES {
+      UUID id PK "Identificador único da nota"
+      UUID user_id FK "Usuário proprietário da nota"
+      UUID note_type_id FK "Tipo de nota associado"
+      TEXT tags "Tags associadas (separadas por espaço)"
+      JSON fields "Conteúdo dos campos da nota"
+      TIMESTAMP created_at "Data de criação"
+      TIMESTAMP updated_at "Data de atualização"
+      TIMESTAMP deleted_at "Data de exclusão lógica"
+    }
+
+    NOTE_FIELDS {
+      UUID id PK "Identificador único do campo"
+      UUID note_type_id FK "Tipo de nota associado"
+      TEXT name "Nome do campo"
+      INTEGER field_order "Ordem do campo na nota"
+      BOOLEAN required "Se o campo é obrigatório"
+      TIMESTAMP created_at "Data de criação"
+    }
+
+    CARD_INSTANCES {
+      UUID id PK "Identificador único do cartão"
+      UUID note_id FK "Nota associada"
+      INTEGER card_ordinal "Índice do cartão na nota"
+      INTEGER queue "Fila (aprendizagem, revisão, etc)"
+      INTEGER type "Tipo do cartão"
+      INTEGER due "Data de vencimento (dias desde epoch)"
+      INTEGER interval "Intervalo em dias"
+      INTEGER factor "Fator de facilidade"
+      INTEGER reps "Repetições bem-sucedidas"
+      INTEGER lapses "Lapsos (erros consecutivos)"
+      TIMESTAMP last_reviewed "Data da última revisão"
+      TIMESTAMP next_review "Próxima data de revisão"
+      TIMESTAMP created_at "Data de criação"
+      TIMESTAMP updated_at "Data de atualização"
+      TIMESTAMP deleted_at "Data de exclusão lógica"
+    }
+
+    CARD_REVIEWS {
+      UUID id PK "Identificador único da revisão"
+      UUID card_instance_id FK "Instância de cartão revisada"
+      UUID user_id FK "Usuário que revisou"
+      INTEGER ease "Nota de facilidade (0-5)"
+      INTEGER time_taken_ms "Tempo gasto em ms"
+      TIMESTAMP reviewed_at "Data e hora da revisão"
+    }
+
+    MEDIA_FILES {
+      UUID id PK "Identificador único do arquivo"
+      UUID user_id FK "Usuário proprietário do arquivo"
+      TEXT filename "Nome original do arquivo"
+      TEXT mime_type "Tipo MIME do arquivo"
+      TEXT path "Caminho ou URL de armazenamento"
+      TIMESTAMP uploaded_at "Data de upload"
+    }
+
+    SYNC_LOGS {
+      UUID id PK "Identificador único do log"
+      UUID user_id FK "Usuário associado"
+      TEXT device_name "Nome do dispositivo"
+      TIMESTAMP last_sync_at "Data da última sincronização"
+    }
+
+    ADDONS {
+      UUID id PK "Identificador único do addon"
+      TEXT name "Nome do addon"
+      TEXT description "Descrição do addon"
+      TEXT repo_url "URL do repositório"
+      BOOLEAN is_enabled "Se o addon está habilitado"
+      TIMESTAMP created_at "Data de criação"
+    }
+
+    SETTINGS {
+      UUID id PK "Identificador único da configuração"
+      UUID user_id FK "Usuário proprietário"
+      UUID scheduler_id FK "Scheduler associado"
+      TEXT key "Chave da configuração"
+      TEXT value "Valor da configuração"
+      TIMESTAMP created_at "Data de criação"
+      TIMESTAMP updated_at "Data de atualização"
+    }
+
+    SCHEDULERS {
+      UUID id PK "Identificador único do scheduler"
+      TEXT name "Nome do algoritmo de revisão"
+      TEXT description "Descrição do algoritmo"
+      BOOLEAN is_active "Se está ativo por padrão"
+      TIMESTAMP created_at "Data de criação"
+    }
+
+    CARD_TAGS {
+      UUID id PK "Identificador único da tag do cartão"
+      UUID note_id FK "Nota associada"
+      UUID tag_id FK "Tag associada"
+      TIMESTAMP created_at "Data de criação"
+      TIMESTAMP deleted_at "Data de exclusão lógica"
     }
 ```
