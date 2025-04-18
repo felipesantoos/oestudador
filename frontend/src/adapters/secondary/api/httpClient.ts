@@ -20,21 +20,38 @@ export class HttpClient {
     this.client.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('auth_token');
+        console.log('Request interceptor - Token:', token ? 'Present' : 'Missing');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
+          console.log('Request headers:', config.headers);
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => {
+        console.error('Request interceptor error:', error);
+        return Promise.reject(error);
+      }
     );
 
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log('Response received:', response.status, response.config.url);
+        return response;
+      },
       (error) => {
-        if (error.response && error.response.status === 401) {
-          // Handle unauthorized access
-          localStorage.removeItem('auth_token');
-          window.location.href = '/login';
+        console.error('Response error:', {
+          status: error.response?.status,
+          url: error.config?.url,
+          message: error.message,
+          response: error.response?.data
+        });
+        
+        if (error.response?.status === 401) {
+          // Only redirect if we're not already on the login page
+          if (!window.location.pathname.includes('/login')) {
+            localStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(error);
       }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../state/authStore';
 
@@ -9,12 +9,18 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, user, fetchCurrentUser, isLoading } = useAuthStore();
   const location = useLocation();
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading && !user) {
-      fetchCurrentUser();
+    // Only attempt to fetch if we haven't tried yet and we're not authenticated
+    if (!isAuthenticated && !isLoading && !user && !hasAttemptedFetch) {
+      setHasAttemptedFetch(true);
+      fetchCurrentUser().catch(error => {
+        console.error('Error fetching current user:', error);
+        // Don't set hasAttemptedFetch to false here to prevent infinite retries
+      });
     }
-  }, [isAuthenticated, fetchCurrentUser, isLoading, user]);
+  }, [isAuthenticated, fetchCurrentUser, isLoading, user, hasAttemptedFetch]);
 
   if (isLoading) {
     return (
