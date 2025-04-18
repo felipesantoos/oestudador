@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { User } from '../core/domain/entities/user';
-import { ApiAuthService } from '../adapters/secondary/services/authService';
+import { AuthService } from '../adapters/secondary/services/authService';
 import { UserRepository } from '../adapters/secondary/repositories/userRepository';
 import { AuthUseCase } from '../core/usecases/auth';
 
@@ -23,7 +23,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // Create instances of services and use cases
-const authService = new ApiAuthService();
+const authService = new AuthService();
 const userRepository = new UserRepository();
 const authUseCase = new AuthUseCase(authService, userRepository);
 
@@ -37,18 +37,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      const user = await authUseCase.login(email, password);
+      const user = await authService.login(email, password);
       
       if (user) {
         setUser(user);
         setIsAuthenticated(true);
         setIsLoading(false);
         return true;
-      } else {
-        setError('Invalid credentials');
-        setIsLoading(false);
-        return false;
       }
+      
+      setError('Invalid credentials');
+      setIsLoading(false);
+      return false;
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred during login');
       setIsLoading(false);
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutAll = useCallback(async () => {
     setIsLoading(true);
     try {
-      await authService.logoutAll();
+      await authService.logout();
       setUser(null);
       setIsAuthenticated(false);
       setIsLoading(false);
@@ -191,4 +191,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}

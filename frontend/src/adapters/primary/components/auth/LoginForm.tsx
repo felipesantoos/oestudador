@@ -7,6 +7,7 @@ import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -19,7 +20,6 @@ const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -31,22 +31,19 @@ const LoginForm: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      setError(null);
-      await login(data.email, data.password);
-      navigate('/dashboard');
+      const success = await login(data.email, data.password);
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        toast.error('Invalid email or password');
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during login');
+      toast.error(err instanceof Error ? err.message : 'An error occurred during login');
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-          {error}
-        </div>
-      )}
-
       <div>
         <Input
           label="Email address"
