@@ -4,41 +4,45 @@ import { User, AuthUser } from '../../../types';
 export class AuthService {
   async login(email: string, password: string): Promise<AuthUser | null> {
     try {
-      const response = await apiClient.post<{ data: { user: AuthUser; accessToken: string } }>('/auth/login', { 
+      const response = await apiClient.post<{ status: string; message: string; data: { user: AuthUser; accessToken: string } }>('/auth/login', { 
         email, 
         password 
       });
       
-      if (response.data.accessToken) {
+      if (response.data?.accessToken) {
         localStorage.setItem('auth_token', response.data.accessToken);
       }
       
-      return response.data.user;
-    } catch (error) {
-      console.error('Login error:', error);
+      return response.data?.user || null;
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
       throw error;
     }
   }
 
   async register(userData: Omit<User, 'id' | 'role' | 'isEmailVerified' | 'createdAt' | 'updatedAt'>): Promise<User> {
     try {
-      const response = await apiClient.post<{ data: { user: User; accessToken: string } }>('/auth/register', userData);
+      const response = await apiClient.post<{ status: string; message: string; data: { user: User; accessToken: string } }>('/auth/register', userData);
       
-      if (response.data.accessToken) {
+      if (response.data?.accessToken) {
         localStorage.setItem('auth_token', response.data.accessToken);
       }
       
-      return response.data.user;
-    } catch (error) {
-      console.error('Registration error:', error);
+      return response.data?.user;
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
       throw error;
     }
   }
 
   async getCurrentUser(): Promise<User | null> {
     try {
-      const response = await apiClient.get<{ data: { user: User } }>('/auth/me');
-      return response.data.user;
+      const response = await apiClient.get<{ status: string; data: { user: User } }>('/auth/me');
+      return response.data?.user || null;
     } catch (error) {
       console.error('Get current user error:', error);
       return null;
@@ -49,8 +53,10 @@ export class AuthService {
     try {
       await apiClient.post('/auth/logout');
       localStorage.removeItem('auth_token');
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
       throw error;
     }
   }
@@ -59,8 +65,10 @@ export class AuthService {
     try {
       await apiClient.post('/auth/forgot-password', { email });
       return true;
-    } catch (error) {
-      console.error('Reset password error:', error);
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
       throw error;
     }
   }
@@ -69,8 +77,10 @@ export class AuthService {
     try {
       await apiClient.post(`/auth/reset-password/${token}`, { password: newPassword });
       return true;
-    } catch (error) {
-      console.error('Update password error:', error);
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
       throw error;
     }
   }
@@ -82,8 +92,10 @@ export class AuthService {
         newPassword
       });
       return true;
-    } catch (error) {
-      console.error('Change password error:', error);
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
       throw error;
     }
   }

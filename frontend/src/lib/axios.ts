@@ -61,19 +61,10 @@ class ApiClient {
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return this.instance(originalRequest);
           } catch (refreshError) {
-            // If refresh fails, clear token and redirect to login
+            // If refresh fails, clear token but don't redirect
             localStorage.removeItem('auth_token');
-            window.location.href = '/login';
             return Promise.reject(refreshError);
           }
-        }
-
-        // Handle rate limiting errors
-        if (error.response?.status === 429) {
-          const retryAfter = error.response.headers['retry-after'];
-          const message = error.response.data || 'Too many requests. Please try again later.';
-          
-          return Promise.reject(new Error(message));
         }
 
         return Promise.reject(error);
