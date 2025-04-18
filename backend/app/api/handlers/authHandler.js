@@ -13,6 +13,12 @@ import {
   invalidateAllTokensService
 } from '../../../core/services/authService.js';
 
+// Get the first allowed origin for redirects
+const getFrontendUrl = () => {
+  const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+  return allowedOrigins[0] || 'http://localhost:5174';
+};
+
 // Register a new user
 export const register = async (req, res, next) => {
   try {
@@ -55,11 +61,11 @@ export const verifyEmail = async (req, res, next) => {
     const user = await verifyEmailService(token);
     
     // Redirect to frontend with success message
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/verification-success`);
+    return res.redirect(`${getFrontendUrl()}/auth/verification-success`);
     
   } catch (error) {
     // Redirect to frontend with error message
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/verification-error?message=${encodeURIComponent(error.message)}`);
+    return res.redirect(`${getFrontendUrl()}/auth/verification-error?message=${encodeURIComponent(error.message)}`);
   }
 };
 
