@@ -4,7 +4,7 @@ import { LoginPage } from './app/ui/pages/LoginPage';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
     </Routes>
   );
