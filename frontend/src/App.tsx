@@ -9,6 +9,8 @@ import ProtectedRoute from './adapters/primary/components/ProtectedRoute';
 // Auth pages
 import LoginPage from './adapters/primary/pages/LoginPage';
 import RegisterPage from './adapters/primary/pages/RegisterPage';
+import ForgotPasswordPage from './adapters/primary/pages/ForgotPasswordPage';
+import ResetPasswordPage from './adapters/primary/pages/ResetPasswordPage';
 
 // Main pages
 import DashboardPage from './adapters/primary/pages/DashboardPage';
@@ -37,6 +39,8 @@ function App() {
             {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             
             {/* Protected routes */}
             <Route path="/dashboard" element={

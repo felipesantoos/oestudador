@@ -25,6 +25,14 @@ export class ApiAuthService implements AuthService {
     }
   }
 
+  async logoutAll(): Promise<void> {
+    try {
+      await httpClient.post('/auth/logout-all');
+    } finally {
+      localStorage.removeItem('auth_token');
+    }
+  }
+
   async register(userData: Omit<User, 'id' | 'role' | 'isEmailVerified' | 'createdAt' | 'updatedAt'>): Promise<User> {
     const response = await httpClient.post<{ user: User; token: string }>('/auth/register', userData);
     
@@ -45,7 +53,7 @@ export class ApiAuthService implements AuthService {
 
   async resetPassword(email: string): Promise<boolean> {
     try {
-      await httpClient.post('/auth/reset-password', { email });
+      await httpClient.post('/auth/forgot-password', { email });
       return true;
     } catch (error) {
       return false;
@@ -54,7 +62,19 @@ export class ApiAuthService implements AuthService {
 
   async updatePassword(token: string, newPassword: string): Promise<boolean> {
     try {
-      await httpClient.post('/auth/update-password', { token, password: newPassword });
+      await httpClient.post(`/auth/reset-password/${token}`, { password: newPassword });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<boolean> {
+    try {
+      await httpClient.post('/auth/change-password', { 
+        currentPassword,
+        newPassword
+      });
       return true;
     } catch (error) {
       return false;

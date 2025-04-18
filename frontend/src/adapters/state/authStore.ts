@@ -12,8 +12,11 @@ interface AuthState {
   login: (email: string, password: string) => Promise<boolean>;
   register: (userData: Omit<User, 'id' | 'role' | 'isEmailVerified' | 'createdAt' | 'updatedAt'>) => Promise<boolean>;
   logout: () => Promise<void>;
+  logoutAll: () => Promise<void>;
   fetchCurrentUser: () => Promise<void>;
   resetPassword: (email: string) => Promise<boolean>;
+  updatePassword: (token: string, newPassword: string) => Promise<boolean>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
   updateProfile: (profileData: Partial<User>) => Promise<boolean>;
 }
 
@@ -73,6 +76,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  logoutAll: async () => {
+    set({ isLoading: true });
+    try {
+      await authService.logoutAll();
+      set({ user: null, isAuthenticated: false, isLoading: false });
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to logout from all devices', 
+        isLoading: false 
+      });
+    }
+  },
+
   fetchCurrentUser: async () => {
     set({ isLoading: true });
     try {
@@ -99,6 +115,43 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to reset password', 
+        isLoading: false 
+      });
+      return false;
+    }
+  },
+
+  updatePassword: async (token: string, newPassword: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const success = await authService.updatePassword(token, newPassword);
+      set({ isLoading: false });
+      return success;
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to update password', 
+        isLoading: false 
+      });
+      return false;
+    }
+  },
+
+  changePassword: async (currentPassword: string, newPassword: string) => {
+    set({ isLoading: true, error: null });
+    const { user } = get();
+    
+    if (!user) {
+      set({ error: 'Not authenticated', isLoading: false });
+      return false;
+    }
+    
+    try {
+      await authService.changePassword(currentPassword, newPassword);
+      set({ isLoading: false });
+      return true;
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to change password', 
         isLoading: false 
       });
       return false;
