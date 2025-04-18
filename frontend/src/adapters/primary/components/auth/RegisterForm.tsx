@@ -5,20 +5,47 @@ import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
+import Select from '../ui/Select';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character'),
   confirmPassword: z.string(),
+  timezone: z.string().min(1, 'Timezone is required'),
+  language: z.string().min(1, 'Language is required'),
+  birthDate: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
+
+const timezones = [
+  { value: 'America/Sao_Paulo', label: 'America/Sao_Paulo (GMT-3)' },
+  { value: 'America/New_York', label: 'America/New_York (GMT-4)' },
+  { value: 'Europe/London', label: 'Europe/London (GMT+1)' },
+  { value: 'Europe/Paris', label: 'Europe/Paris (GMT+2)' },
+  { value: 'Asia/Tokyo', label: 'Asia/Tokyo (GMT+9)' },
+  { value: 'Australia/Sydney', label: 'Australia/Sydney (GMT+10)' },
+];
+
+const languages = [
+  { value: 'en', label: 'English' },
+  { value: 'pt', label: 'Portuguese' },
+  { value: 'es', label: 'Spanish' },
+  { value: 'fr', label: 'French' },
+  { value: 'de', label: 'German' },
+  { value: 'it', label: 'Italian' },
+];
 
 const RegisterForm: React.FC = () => {
   const { register: registerUser } = useAuth();
@@ -125,6 +152,36 @@ const RegisterForm: React.FC = () => {
             )}
           </button>
         </div>
+      </div>
+
+      <div>
+        <Select
+          label="Timezone"
+          fullWidth
+          options={timezones}
+          {...register('timezone')}
+          error={errors.timezone?.message}
+        />
+      </div>
+
+      <div>
+        <Select
+          label="Language"
+          fullWidth
+          options={languages}
+          {...register('language')}
+          error={errors.language?.message}
+        />
+      </div>
+
+      <div>
+        <Input
+          label="Birth Date (optional)"
+          type="date"
+          fullWidth
+          {...register('birthDate')}
+          error={errors.birthDate?.message}
+        />
       </div>
 
       <Button type="submit" fullWidth disabled={isSubmitting}>
