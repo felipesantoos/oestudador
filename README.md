@@ -55,9 +55,6 @@ erDiagram
     TOPICS ||--o{ TOPIC_RELATIONS : origin
     TOPICS ||--o{ TOPIC_RELATIONS : target
     TOPIC_RELATION_TYPES ||--o{ TOPIC_RELATIONS : defines
-    USERS ||--o{ FLASHCARDS : creates
-    PLAN_TOPICS ||--o{ FLASHCARDS : has
-    FLASHCARDS ||--o{ FLASHCARD_REVIEWS : reviewed_as
     USERS ||--o{ DATA_EXPORTS : requests
     USERS ||--o{ DATA_IMPORTS : uploads
     USERS ||--o{ NOTIFICATIONS : receives
@@ -552,29 +549,6 @@ erDiagram
         TIMESTAMP created_at
     }
 
-    FLASHCARDS {
-        UUID id PK
-        UUID user_id FK
-        UUID plan_topic_id FK
-        TEXT front
-        TEXT back
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
-        TIMESTAMP deleted_at
-    }
-
-    FLASHCARD_REVIEWS {
-        UUID id PK
-        UUID flashcard_id FK
-        DATE reviewed_at
-        INTEGER ease "0-5"
-        INTEGER interval "em dias"
-        FLOAT easiness_factor
-        INTEGER repetitions
-        DATE next_review_at
-        TIMESTAMP created_at
-    }
-
     DATA_EXPORTS {
         UUID id PK
         UUID user_id FK
@@ -716,7 +690,6 @@ erDiagram
       UUID id PK "Identificador único da nota"
       UUID user_id FK "Usuário proprietário da nota"
       UUID note_type_id FK "Tipo de nota associado"
-      TEXT tags "Tags associadas (separadas por espaço)"
       JSON fields "Conteúdo dos campos da nota"
       TIMESTAMP created_at "Data de criação"
       TIMESTAMP updated_at "Data de atualização"
