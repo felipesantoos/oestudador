@@ -48,35 +48,29 @@ const LoginForm: React.FC = () => {
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email address
-        </label>
-        <div className="mt-1">
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            {...register('email')}
-            error={errors.email?.message}
-          />
-        </div>
+        <Input
+          label="Email address"
+          type="email"
+          autoComplete="email"
+          fullWidth
+          {...register('email')}
+          error={errors.email?.message}
+        />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <div className="mt-1 relative">
+        <div className="relative">
           <Input
-            id="password"
+            label="Password"
             type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
+            fullWidth
             {...register('password')}
             error={errors.password?.message}
           />
           <button
             type="button"
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+            className="absolute right-3 top-9 text-gray-400 hover:text-gray-500"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? (
@@ -108,11 +102,9 @@ const LoginForm: React.FC = () => {
         </div>
       </div>
 
-      <div>
-        <Button type="submit" fullWidth disabled={isSubmitting}>
-          {isSubmitting ? 'Signing in...' : 'Sign in'}
-        </Button>
-      </div>
+      <Button type="submit" fullWidth disabled={isSubmitting}>
+        {isSubmitting ? 'Signing in...' : 'Sign in'}
+      </Button>
     </form>
   );
 };

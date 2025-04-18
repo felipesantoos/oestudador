@@ -58,50 +58,40 @@ const RegisterForm: React.FC = () => {
       )}
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Name
-        </label>
-        <div className="mt-1">
-          <Input
-            id="name"
-            type="text"
-            autoComplete="name"
-            {...register('name')}
-            error={errors.name?.message}
-          />
-        </div>
+        <Input
+          label="Full name"
+          type="text"
+          autoComplete="name"
+          fullWidth
+          {...register('name')}
+          error={errors.name?.message}
+        />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email address
-        </label>
-        <div className="mt-1">
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            {...register('email')}
-            error={errors.email?.message}
-          />
-        </div>
+        <Input
+          label="Email address"
+          type="email"
+          autoComplete="email"
+          fullWidth
+          {...register('email')}
+          error={errors.email?.message}
+        />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <div className="mt-1 relative">
+        <div className="relative">
           <Input
-            id="password"
+            label="Password"
             type={showPassword ? 'text' : 'password'}
             autoComplete="new-password"
+            fullWidth
             {...register('password')}
             error={errors.password?.message}
           />
           <button
             type="button"
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+            className="absolute right-3 top-9 text-gray-400 hover:text-gray-500"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? (
@@ -114,20 +104,18 @@ const RegisterForm: React.FC = () => {
       </div>
 
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-          Confirm Password
-        </label>
-        <div className="mt-1 relative">
+        <div className="relative">
           <Input
-            id="confirmPassword"
+            label="Confirm password"
             type={showConfirmPassword ? 'text' : 'password'}
             autoComplete="new-password"
+            fullWidth
             {...register('confirmPassword')}
             error={errors.confirmPassword?.message}
           />
           <button
             type="button"
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+            className="absolute right-3 top-9 text-gray-400 hover:text-gray-500"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           >
             {showConfirmPassword ? (
@@ -139,11 +127,9 @@ const RegisterForm: React.FC = () => {
         </div>
       </div>
 
-      <div>
-        <Button type="submit" fullWidth disabled={isSubmitting}>
-          {isSubmitting ? 'Registering...' : 'Register'}
-        </Button>
-      </div>
+      <Button type="submit" fullWidth disabled={isSubmitting}>
+        {isSubmitting ? 'Creating account...' : 'Create account'}
+      </Button>
     </form>
   );
 };
