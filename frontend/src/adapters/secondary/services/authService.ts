@@ -4,17 +4,17 @@ import { User, AuthUser } from '../../../types';
 export class AuthService {
   async login(email: string, password: string, rememberMe: boolean = false): Promise<AuthUser | null> {
     try {
-      const response = await apiClient.post<{ status: string; message: string; data: { user: AuthUser; accessToken: string } }>('/auth/login', { 
+      const response = await apiClient.post<{ user: AuthUser; accessToken: string; refreshToken: string }>('/auth/login', { 
         email, 
         password,
         rememberMe
       });
       
-      if (response.data?.accessToken) {
-        localStorage.setItem('auth_token', response.data.accessToken);
+      if (response.accessToken) {
+        localStorage.setItem('auth_token', response.accessToken);
       }
       
-      return response.data?.user || null;
+      return response.user || null;
     } catch (error: any) {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
@@ -25,8 +25,8 @@ export class AuthService {
 
   async register(userData: Omit<User, 'id' | 'role' | 'isEmailVerified' | 'createdAt' | 'updatedAt'>): Promise<User> {
     try {
-      const response = await apiClient.post<{ status: string; message: string; data: { user: User } }>('/auth/register', userData);
-      return response.data?.user;
+      const response = await apiClient.post<{ user: User }>('/auth/register', userData);
+      return response.user;
     } catch (error: any) {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
@@ -59,8 +59,8 @@ export class AuthService {
 
   async getCurrentUser(): Promise<User | null> {
     try {
-      const response = await apiClient.get<{ status: string; data: { user: User } }>('/auth/me');
-      return response.data?.user || null;
+      const response = await apiClient.get<{ user: User }>('/auth/me');
+      return response.user || null;
     } catch (error) {
       return null;
     }
@@ -128,8 +128,8 @@ export class AuthService {
 
   async refreshToken(): Promise<string | null> {
     try {
-      const response = await apiClient.post<{ status: string; data: { accessToken: string } }>('/auth/refresh-token');
-      return response.data?.accessToken || null;
+      const response = await apiClient.post<{ accessToken: string }>('/auth/refresh-token');
+      return response.accessToken || null;
     } catch (error) {
       return null;
     }
