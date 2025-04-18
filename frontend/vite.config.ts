@@ -1,19 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@app': path.resolve(__dirname, './src/app'),
-      '@core': path.resolve(__dirname, './src/core'),
-      '@infra': path.resolve(__dirname, './src/infra')
-    }
+  optimizeDeps: {
+    exclude: ['lucide-react'],
   },
-  server: {
-    port: 5173,
-    host: true
-  }
 });
