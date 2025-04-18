@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { AuthPort, LoginCredentials, RegisterData } from '@core/interfaces/primary/authPort';
-import { AuthResponse, User } from '@core/domains/user';
+import { AuthPort, LoginCredentials, RegisterData } from '../../../core/interfaces/primary/authPort';
+import { AuthResponse, User } from '../../../core/domains/user';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 

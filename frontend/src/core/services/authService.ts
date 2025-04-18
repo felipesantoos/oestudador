@@ -1,5 +1,5 @@
-import { AuthPort, LoginCredentials, RegisterData } from '@core/interfaces/primary/authPort';
-import { User, AuthResponse } from '@core/domains/user';
+import { AuthPort, LoginCredentials, RegisterData } from '../interfaces/primary/authPort';
+import { User, AuthResponse } from '../domains/user';
 
 export class AuthService {
   constructor(private readonly authPort: AuthPort) {}
