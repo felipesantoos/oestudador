@@ -55,6 +55,29 @@ erDiagram
     TOPICS ||--o{ TOPIC_RELATIONS : origin
     TOPICS ||--o{ TOPIC_RELATIONS : target
     TOPIC_RELATION_TYPES ||--o{ TOPIC_RELATIONS : defines
+    USERS ||--o{ FLASHCARDS : creates
+    PLAN_TOPICS ||--o{ FLASHCARDS : has
+    FLASHCARDS ||--o{ FLASHCARD_REVIEWS : reviewed_as
+    USERS ||--o{ DATA_EXPORTS : requests
+    USERS ||--o{ DATA_IMPORTS : uploads
+    USERS ||--o{ NOTIFICATIONS : receives
+    NOTIFICATION_TYPES ||--o{ NOTIFICATIONS : defines
+    USERS ||--o{ TAGS : owns
+    PLAN_TOPICS ||--o{ PLAN_TOPIC_TAGS : tagged_with
+    TAGS ||--o{ PLAN_TOPIC_TAGS : used_on
+    USERS ||--o{ STUDY_GROUPS : owns
+    STUDY_GROUPS ||--o{ STUDY_GROUP_MEMBERS : includes
+    USERS ||--o{ STUDY_GROUP_MEMBERS : participates
+    USERS ||--o{ RESOURCE_FEEDBACKS : writes
+    PLAN_TOPIC_RESOURCES ||--o{ RESOURCE_FEEDBACKS : receives
+    USERS ||--o{ STUDY_CALENDAR_EVENTS : plans
+    STUDY_CALENDAR_EVENTS ||--o{ STUDY_RECORDS : links
+    STUDY_CALENDAR_EVENTS ||--o{ SCHEDULED_REVIEWS : links
+    STUDY_CALENDAR_EVENTS ||--o{ SIMULATED_EXAMS : links
+    USERS ||--o{ ANALYSIS_SNAPSHOTS : owns
+    USERS ||--o{ FAVORITE_RESOURCES : marks
+    PLAN_TOPIC_RESOURCES ||--o{ FAVORITE_RESOURCES : is_favorite
+    USERS ||--o{ STUDY_ASSISTANT_MESSAGES : receives
 
     USERS {
         UUID id PK "Identificador único"
@@ -511,6 +534,153 @@ erDiagram
         UUID id PK
         TEXT name "Ex: prerequisite, complementary"
         TEXT description
+        TIMESTAMP created_at
+    }
+
+    FLASHCARDS {
+        UUID id PK
+        UUID user_id FK
+        UUID plan_topic_id FK
+        TEXT front
+        TEXT back
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
+    }
+
+    FLASHCARD_REVIEWS {
+        UUID id PK
+        UUID flashcard_id FK
+        DATE reviewed_at
+        INTEGER ease "0-5"
+        INTEGER interval "em dias"
+        FLOAT easiness_factor
+        INTEGER repetitions
+        DATE next_review_at
+        TIMESTAMP created_at
+    }
+
+    DATA_EXPORTS {
+        UUID id PK
+        UUID user_id FK
+        TIMESTAMP requested_at
+        TEXT status
+        TEXT download_url
+        TEXT format
+        TIMESTAMP deleted_at
+    }
+
+    DATA_IMPORTS {
+        UUID id PK
+        UUID user_id FK
+        TIMESTAMP imported_at
+        TEXT status
+        TEXT source_platform
+        TEXT summary
+        TIMESTAMP deleted_at
+    }
+
+    NOTIFICATIONS {
+        UUID id PK
+        UUID user_id FK
+        UUID notification_type_id FK
+        TEXT title
+        TEXT message
+        BOOLEAN read
+        TIMESTAMP scheduled_at
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    NOTIFICATION_TYPES {
+        UUID id PK
+        TEXT name
+        TEXT description
+        TEXT icon
+        TIMESTAMP created_at
+    }
+
+    TAGS {
+        UUID id PK
+        UUID user_id FK
+        TEXT name
+        TEXT color
+        TIMESTAMP created_at
+    }
+
+    PLAN_TOPIC_TAGS {
+        UUID id PK
+        UUID plan_topic_id FK
+        UUID tag_id FK
+        TIMESTAMP created_at
+    }
+
+    STUDY_GROUPS {
+        UUID id PK
+        TEXT name
+        TEXT description
+        UUID admin_user_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        TIMESTAMP deleted_at
+    }
+
+    STUDY_GROUP_MEMBERS {
+        UUID id PK
+        UUID group_id FK
+        UUID user_id FK
+        TEXT role "admin | member"
+        TIMESTAMP joined_at
+        TIMESTAMP deleted_at
+    }
+
+    RESOURCE_FEEDBACKS {
+        UUID id PK
+        UUID user_id FK
+        UUID plan_topic_resource_id FK
+        INTEGER rating
+        TEXT comment
+        TIMESTAMP created_at
+        TIMESTAMP deleted_at
+    }
+
+    STUDY_CALENDAR_EVENTS {
+        UUID id PK
+        UUID user_id FK
+        TEXT type "study | review | simulado"
+        UUID related_id FK
+        TEXT title
+        TIMESTAMP start_time
+        TIMESTAMP end_time
+        TEXT color
+        TIMESTAMP created_at
+        TIMESTAMP deleted_at
+    }
+
+    ANALYSIS_SNAPSHOTS {
+        UUID id PK
+        UUID user_id FK
+        DATE period_start
+        DATE period_end
+        JSON summary_json
+        TIMESTAMP created_at
+        TIMESTAMP deleted_at
+    }
+
+    FAVORITE_RESOURCES {
+        UUID id PK
+        UUID user_id FK
+        UUID plan_topic_resource_id FK
+        TIMESTAMP favorited_at
+        TIMESTAMP deleted_at
+    }
+
+    STUDY_ASSISTANT_MESSAGES {
+        UUID id PK
+        UUID user_id FK
+        TEXT trigger_type
+        TEXT message
+        TEXT action_url
         TIMESTAMP created_at
     }
 ```
