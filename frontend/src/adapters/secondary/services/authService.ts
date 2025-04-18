@@ -18,7 +18,7 @@ export class AuthService {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
-      throw error;
+      throw new Error('Unable to login. Please try again later.');
     }
   }
 
@@ -35,7 +35,7 @@ export class AuthService {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
-      throw error;
+      throw new Error('Unable to create account. Please try again later.');
     }
   }
 
@@ -44,7 +44,6 @@ export class AuthService {
       const response = await apiClient.get<{ status: string; data: { user: User } }>('/auth/me');
       return response.data?.user || null;
     } catch (error) {
-      console.error('Get current user error:', error);
       return null;
     }
   }
@@ -57,7 +56,7 @@ export class AuthService {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
-      throw error;
+      throw new Error('Unable to logout. Please try again later.');
     }
   }
 
@@ -69,7 +68,7 @@ export class AuthService {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
-      throw error;
+      throw new Error('Unable to reset password. Please try again later.');
     }
   }
 
@@ -81,7 +80,7 @@ export class AuthService {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
-      throw error;
+      throw new Error('Unable to update password. Please try again later.');
     }
   }
 
@@ -96,7 +95,7 @@ export class AuthService {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
-      throw error;
+      throw new Error('Unable to change password. Please try again later.');
     }
   }
 }

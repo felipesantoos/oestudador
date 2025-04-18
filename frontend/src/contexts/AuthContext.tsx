@@ -23,7 +23,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Create instances of services and use cases
 const authService = new AuthService();
 const userRepository = new UserRepository();
 const authUseCase = new AuthUseCase(authService, userRepository);
@@ -47,7 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return true;
       }
       
-      throw new Error('Invalid credentials');
+      setIsLoading(false);
+      return false;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An error occurred during login';
       setError(message);
@@ -79,9 +79,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       await authUseCase.logout();
-    } finally {
       setUser(null);
       setIsAuthenticated(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'An error occurred during logout';
+      toast.error(message);
+    } finally {
       setIsLoading(false);
     }
   }, []);
@@ -92,11 +95,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await authService.logout();
       setUser(null);
       setIsAuthenticated(false);
-      setIsLoading(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to logout from all devices';
       setError(message);
       toast.error(message);
+    } finally {
       setIsLoading(false);
     }
   }, []);
@@ -107,10 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const user = await authUseCase.getCurrentUser();
       setUser(user);
       setIsAuthenticated(!!user);
-      setIsLoading(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to fetch user';
       setError(message);
+    } finally {
       setIsLoading(false);
     }
   }, []);
