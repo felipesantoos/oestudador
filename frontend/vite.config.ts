@@ -11,5 +11,9 @@ export default defineConfig({
       '@core': path.resolve(__dirname, './src/core'),
       '@infra': path.resolve(__dirname, './src/infra')
     }
+  },
+  server: {
+    port: 5173,
+    host: true
   }
 });

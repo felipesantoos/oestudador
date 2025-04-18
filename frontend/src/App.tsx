@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { LoginPage } from '@app/ui/pages/LoginPage';
+import { LoginPage } from './app/ui/pages/LoginPage';
 
 function App() {
   return (
