@@ -2,7 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './app/api/docs/swagger.js';
 import { logger } from './app/shared/logger.js';
@@ -10,8 +12,22 @@ import { errorHandler } from './app/api/middlewares/errorMiddleware.js';
 import { databaseConnection } from './infra/repository/postgres/connection.js';
 import authRoutes from './app/api/routes/authRoutes.js';
 
+// Get the current file's directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // Load environment variables
-dotenv.config();
+const envPath = resolve(__dirname, '.env');
+console.log('Loading .env from:', envPath);
+dotenv.config({ path: envPath });
+
+// Debug log environment variables
+console.log('Environment variables loaded:', {
+  EMAIL_USER: process.env.EMAIL_USER,
+  EMAIL_FROM: process.env.EMAIL_FROM,
+  hasPassword: !!process.env.EMAIL_PASS,
+  NODE_ENV: process.env.NODE_ENV
+});
 
 // Initialize express app
 const app = express();

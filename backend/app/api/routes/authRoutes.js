@@ -1,6 +1,18 @@
 import express from 'express';
 import { body } from 'express-validator';
-import * as authHandler from '../handlers/authHandler.js';
+import {
+  registerUserHandler,
+  verifyEmailHandler,
+  resendVerificationEmailHandler,
+  loginUserHandler,
+  refreshTokenHandler,
+  forgotPasswordHandler,
+  resetPasswordHandler,
+  changePasswordHandler,
+  getUserProfileHandler,
+  logoutUserHandler,
+  logoutAllDevicesHandler
+} from '../handlers/authHandler.js';
 import { validateRequest } from '../middlewares/validationMiddleware.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
 import { rateLimiter } from '../middlewares/rateLimiterMiddleware.js';
@@ -44,24 +56,7 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post(
-  '/register',
-  [
-    body('name').notEmpty().withMessage('Name is required'),
-    body('email').isEmail().withMessage('Valid email is required'),
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters long')
-      .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
-      .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
-      .matches(/[0-9]/).withMessage('Password must contain at least one number')
-      .matches(/[^a-zA-Z0-9]/).withMessage('Password must contain at least one special character'),
-    body('timezone').notEmpty().withMessage('Timezone is required'),
-    body('language').notEmpty().withMessage('Language is required')
-  ],
-  validateRequest,
-  authHandler.register
-);
+router.post('/register', registerUserHandler);
 
 /**
  * @swagger
@@ -79,7 +74,7 @@ router.post(
  *       302:
  *         description: Redirects to frontend verification success/error page
  */
-router.get('/verify-email/:token', authHandler.verifyEmail);
+router.get('/verify-email/:token', verifyEmailHandler);
 
 /**
  * @swagger
@@ -104,14 +99,7 @@ router.get('/verify-email/:token', authHandler.verifyEmail);
  *       400:
  *         description: Invalid email
  */
-router.post(
-  '/resend-verification',
-  [
-    body('email').isEmail().withMessage('Valid email is required')
-  ],
-  validateRequest,
-  authHandler.resendVerification
-);
+router.post('/resend-verification', resendVerificationEmailHandler);
 
 /**
  * @swagger
@@ -155,17 +143,7 @@ router.post(
  *       403:
  *         description: Account locked or email not verified
  */
-router.post(
-  '/login',
-  rateLimiter({ windowMs: 15 * 60 * 1000, max: 5, message: 'Too many login attempts, please try again later' }),
-  [
-    body('email').isEmail().withMessage('Valid email is required'),
-    body('password').notEmpty().withMessage('Password is required'),
-    body('rememberMe').optional().isBoolean()
-  ],
-  validateRequest,
-  authHandler.login
-);
+router.post('/login', loginUserHandler);
 
 /**
  * @swagger
@@ -182,7 +160,7 @@ router.post(
  *       401:
  *         description: Not authenticated
  */
-router.post('/logout', authenticate, authHandler.logout);
+router.post('/logout', logoutUserHandler);
 
 /**
  * @swagger
@@ -196,7 +174,7 @@ router.post('/logout', authenticate, authHandler.logout);
  *       401:
  *         description: Invalid or expired refresh token
  */
-router.post('/refresh-token', authHandler.refreshToken);
+router.post('/refresh-token', refreshTokenHandler);
 
 /**
  * @swagger
@@ -221,15 +199,7 @@ router.post('/refresh-token', authHandler.refreshToken);
  *       400:
  *         description: Invalid email format
  */
-router.post(
-  '/forgot-password',
-  rateLimiter({ windowMs: 60 * 60 * 1000, max: 3, message: 'Too many password reset attempts, please try again later' }),
-  [
-    body('email').isEmail().withMessage('Valid email is required')
-  ],
-  validateRequest,
-  authHandler.forgotPassword
-);
+router.post('/forgot-password', forgotPasswordHandler);
 
 /**
  * @swagger
@@ -260,20 +230,7 @@ router.post(
  *       400:
  *         description: Invalid or expired token
  */
-router.post(
-  '/reset-password/:token',
-  [
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters long')
-      .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
-      .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
-      .matches(/[0-9]/).withMessage('Password must contain at least one number')
-      .matches(/[^a-zA-Z0-9]/).withMessage('Password must contain at least one special character')
-  ],
-  validateRequest,
-  authHandler.resetPassword
-);
+router.post('/reset-password/:token', resetPasswordHandler);
 
 /**
  * @swagger
@@ -305,22 +262,7 @@ router.post(
  *       401:
  *         description: Not authenticated
  */
-router.post(
-  '/change-password',
-  authenticate,
-  [
-    body('currentPassword').notEmpty().withMessage('Current password is required'),
-    body('newPassword')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters long')
-      .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
-      .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
-      .matches(/[0-9]/).withMessage('Password must contain at least one number')
-      .matches(/[^a-zA-Z0-9]/).withMessage('Password must contain at least one special character')
-  ],
-  validateRequest,
-  authHandler.changePassword
-);
+router.post('/change-password', authenticate, changePasswordHandler);
 
 /**
  * @swagger
@@ -350,7 +292,7 @@ router.post(
  *       401:
  *         description: Not authenticated
  */
-router.get('/me', authenticate, authHandler.getCurrentUser);
+router.get('/profile', getUserProfileHandler);
 
 /**
  * @swagger
@@ -367,6 +309,6 @@ router.get('/me', authenticate, authHandler.getCurrentUser);
  *       401:
  *         description: Not authenticated
  */
-router.post('/logout-all', authenticate, authHandler.logoutAll);
+router.post('/logout-all', logoutAllDevicesHandler);
 
 export default router;

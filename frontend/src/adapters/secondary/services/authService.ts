@@ -2,11 +2,12 @@ import { apiClient } from '../../../lib/axios';
 import { User, AuthUser } from '../../../types';
 
 export class AuthService {
-  async login(email: string, password: string): Promise<AuthUser | null> {
+  async login(email: string, password: string, rememberMe: boolean = false): Promise<AuthUser | null> {
     try {
       const response = await apiClient.post<{ status: string; message: string; data: { user: AuthUser; accessToken: string } }>('/auth/login', { 
         email, 
-        password 
+        password,
+        rememberMe
       });
       
       if (response.data?.accessToken) {
@@ -24,18 +25,35 @@ export class AuthService {
 
   async register(userData: Omit<User, 'id' | 'role' | 'isEmailVerified' | 'createdAt' | 'updatedAt'>): Promise<User> {
     try {
-      const response = await apiClient.post<{ status: string; message: string; data: { user: User; accessToken: string } }>('/auth/register', userData);
-      
-      if (response.data?.accessToken) {
-        localStorage.setItem('auth_token', response.data.accessToken);
-      }
-      
+      const response = await apiClient.post<{ status: string; message: string; data: { user: User } }>('/auth/register', userData);
       return response.data?.user;
     } catch (error: any) {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
       throw new Error('Unable to create account. Please try again later.');
+    }
+  }
+
+  async verifyEmail(token: string): Promise<void> {
+    try {
+      await apiClient.get(`/auth/verify-email/${token}`);
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error('Unable to verify email. Please try again later.');
+    }
+  }
+
+  async resendVerification(email: string): Promise<void> {
+    try {
+      await apiClient.post('/auth/resend-verification', { email });
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error('Unable to resend verification email. Please try again later.');
     }
   }
 
@@ -60,10 +78,32 @@ export class AuthService {
     }
   }
 
-  async resetPassword(email: string): Promise<boolean> {
+  async logoutAll(): Promise<void> {
+    try {
+      await apiClient.post('/auth/logout-all');
+      localStorage.removeItem('auth_token');
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error('Unable to logout from all devices. Please try again later.');
+    }
+  }
+
+  async forgotPassword(email: string): Promise<void> {
     try {
       await apiClient.post('/auth/forgot-password', { email });
-      return true;
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error('Unable to process password reset request. Please try again later.');
+    }
+  }
+
+  async resetPassword(token: string, password: string): Promise<void> {
+    try {
+      await apiClient.post(`/auth/reset-password/${token}`, { password });
     } catch (error: any) {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
@@ -72,30 +112,26 @@ export class AuthService {
     }
   }
 
-  async updatePassword(token: string, newPassword: string): Promise<boolean> {
-    try {
-      await apiClient.post(`/auth/reset-password/${token}`, { password: newPassword });
-      return true;
-    } catch (error: any) {
-      if (error.response?.data?.message) {
-        throw new Error(error.response.data.message);
-      }
-      throw new Error('Unable to update password. Please try again later.');
-    }
-  }
-
-  async changePassword(currentPassword: string, newPassword: string): Promise<boolean> {
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
     try {
       await apiClient.post('/auth/change-password', { 
         currentPassword,
         newPassword
       });
-      return true;
     } catch (error: any) {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
       throw new Error('Unable to change password. Please try again later.');
+    }
+  }
+
+  async refreshToken(): Promise<string | null> {
+    try {
+      const response = await apiClient.post<{ status: string; data: { accessToken: string } }>('/auth/refresh-token');
+      return response.data?.accessToken || null;
+    } catch (error) {
+      return null;
     }
   }
 }

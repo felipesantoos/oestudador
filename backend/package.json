@@ -2,6 +2,7 @@
   "name": "oestudador-backend",
   "version": "1.0.0",
   "description": "Backend for O Estudador application",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

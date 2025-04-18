@@ -6,13 +6,38 @@ import { logger } from '../../app/shared/logger.js';
  */
 class EmailService {
   constructor() {
+    this.transporter = null;
+  }
+
+  initialize() {
+    // Debug log the email configuration
+    logger.debug('Email configuration:', {
+      user: process.env.EMAIL_USER,
+      from: process.env.EMAIL_FROM,
+      hasPassword: !!process.env.EMAIL_PASS
+    });
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      throw new Error('Email credentials are not properly configured');
+    }
+
     this.transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_PORT === '465',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+      }
+    });
+
+    // Verify the transporter configuration
+    this.transporter.verify((error, success) => {
+      if (error) {
+        logger.error('Email transporter verification failed:', error);
+        throw error;
+      } else {
+        logger.info('Email transporter is ready to send messages');
       }
     });
   }
@@ -23,6 +48,9 @@ class EmailService {
    * @returns {Promise<boolean>} - Success status
    */
   async sendEmail(options) {
+    if (!this.transporter) {
+      this.initialize();
+    }
     try {
       const mailOptions = {
         from: `"${process.env.APP_NAME || 'Authentication Service'}" <${process.env.EMAIL_FROM}>`,

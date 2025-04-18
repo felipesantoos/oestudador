@@ -10,14 +10,16 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
   register: (userData: Omit<User, 'id' | 'role' | 'isEmailVerified' | 'createdAt' | 'updatedAt'>) => Promise<boolean>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
-  fetchCurrentUser: () => Promise<void>;
-  resetPassword: (email: string) => Promise<boolean>;
-  updatePassword: (token: string, newPassword: string) => Promise<boolean>;
+  verifyEmail: (token: string) => Promise<boolean>;
+  resendVerification: (email: string) => Promise<boolean>;
+  forgotPassword: (email: string) => Promise<boolean>;
+  resetPassword: (token: string, newPassword: string) => Promise<boolean>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
+  fetchCurrentUser: () => Promise<void>;
   updateProfile: (profileData: Partial<User>) => Promise<boolean>;
 }
 
@@ -33,11 +35,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string, rememberMe: boolean = false) => {
     setIsLoading(true);
     setError(null);
     try {
-      const user = await authService.login(email, password);
+      const user = await authService.login(email, password, rememberMe);
       
       if (user) {
         setUser(user);
@@ -61,10 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      const user = await authUseCase.register(userData);
+      const user = await authService.register(userData);
       setUser(user);
       setIsAuthenticated(true);
       setIsLoading(false);
+      toast.success('Registration successful! Please check your email to verify your account.');
       return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An error occurred during registration';
@@ -75,12 +78,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const verifyEmail = useCallback(async (token: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await authService.verifyEmail(token);
+      setIsLoading(false);
+      toast.success('Email verified successfully!');
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to verify email';
+      setError(message);
+      toast.error(message);
+      setIsLoading(false);
+      return false;
+    }
+  }, []);
+
+  const resendVerification = useCallback(async (email: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await authService.resendVerification(email);
+      setIsLoading(false);
+      toast.success('Verification email sent! Please check your inbox.');
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to resend verification email';
+      setError(message);
+      toast.error(message);
+      setIsLoading(false);
+      return false;
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await authUseCase.logout();
+      await authService.logout();
       setUser(null);
       setIsAuthenticated(false);
+      toast.success('Logged out successfully');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An error occurred during logout';
       toast.error(message);
@@ -92,9 +130,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutAll = useCallback(async () => {
     setIsLoading(true);
     try {
-      await authService.logout();
+      await authService.logoutAll();
       setUser(null);
       setIsAuthenticated(false);
+      toast.success('Logged out from all devices');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to logout from all devices';
       setError(message);
@@ -107,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchCurrentUser = useCallback(async () => {
     setIsLoading(true);
     try {
-      const user = await authUseCase.getCurrentUser();
+      const user = await authService.getCurrentUser();
       setUser(user);
       setIsAuthenticated(!!user);
     } catch (error) {
@@ -118,15 +157,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const resetPassword = useCallback(async (email: string) => {
+  const forgotPassword = useCallback(async (email: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      await authService.resetPassword(email);
+      await authService.forgotPassword(email);
       setIsLoading(false);
+      toast.success('Password reset instructions sent to your email');
       return true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to reset password';
+      const message = error instanceof Error ? error.message : 'Failed to process password reset';
       setError(message);
       toast.error(message);
       setIsLoading(false);
@@ -134,15 +174,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const updatePassword = useCallback(async (token: string, newPassword: string) => {
+  const resetPassword = useCallback(async (token: string, newPassword: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      await authService.updatePassword(token, newPassword);
+      await authService.resetPassword(token, newPassword);
       setIsLoading(false);
+      toast.success('Password reset successfully');
       return true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to update password';
+      const message = error instanceof Error ? error.message : 'Failed to reset password';
       setError(message);
       toast.error(message);
       setIsLoading(false);
@@ -156,6 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.changePassword(currentPassword, newPassword);
       setIsLoading(false);
+      toast.success('Password changed successfully');
       return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to change password';
@@ -173,6 +215,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const updatedUser = await userRepository.update(user?.id || '', profileData);
       setUser(updatedUser);
       setIsLoading(false);
+      toast.success('Profile updated successfully');
       return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to update profile';
@@ -192,10 +235,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     logoutAll,
-    fetchCurrentUser,
+    verifyEmail,
+    resendVerification,
+    forgotPassword,
     resetPassword,
-    updatePassword,
     changePassword,
+    fetchCurrentUser,
     updateProfile,
   };
 
