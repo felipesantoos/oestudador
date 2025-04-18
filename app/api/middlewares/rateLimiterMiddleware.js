@@ -1,6 +1,6 @@
-const rateLimit = require('express-rate-limit');
+import rateLimit from 'express-rate-limit';
 
-const rateLimiter = (options) => {
+export const rateLimiter = (options) => {
   const defaultOptions = {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
@@ -14,5 +14,3 @@ const rateLimiter = (options) => {
     ...options
   });
 };
-
-module.exports = { rateLimiter };

@@ -1,8 +1,8 @@
-const jwt = require('jsonwebtoken');
-const { AppError } = require('./errorMiddleware');
-const { getUserByIdService } = require('../../../core/services/userService');
+import jwt from 'jsonwebtoken';
+import { AppError } from './errorMiddleware.js';
+import { getUserByIdService } from '../../../core/services/userService.js';
 
-const authenticate = async (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   try {
     // 1. Check if token exists
     const token = req.cookies.accessToken || 
@@ -55,7 +55,7 @@ const authenticate = async (req, res, next) => {
 };
 
 // Middleware for role-based access control
-const restrictTo = (...roles) => {
+export const restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
       return next(new AppError('Authentication required. Please log in.', 401, 'UNAUTHORIZED'));
@@ -67,9 +67,4 @@ const restrictTo = (...roles) => {
     
     next();
   };
-};
-
-module.exports = {
-  authenticate,
-  restrictTo
 };

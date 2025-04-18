@@ -1,7 +1,7 @@
-const { v4: uuidv4 } = require('uuid');
-const { databaseConnection } = require('./connection');
-const { User } = require('../../../core/domains/userDomain');
-const { logger } = require('../../../app/shared/logger');
+import { v4 as uuidv4 } from 'uuid';
+import { databaseConnection } from './connection.js';
+import { User } from '../../../core/domains/userDomain.js';
+import { logger } from '../../../app/shared/logger.js';
 
 /**
  * PostgreSQL implementation of the UserRepositoryPort
@@ -361,6 +361,4 @@ class UserRepository {
   }
 }
 
-const userRepository = new UserRepository();
-
-module.exports = { userRepository };
+export const userRepository = new UserRepository();

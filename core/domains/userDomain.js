@@ -1,7 +1,7 @@
 /**
  * User domain model that represents a user entity
  */
-class User {
+export class User {
   constructor({
     id = null,
     name,
@@ -215,5 +215,3 @@ class User {
     return this;
   }
 }
-
-module.exports = { User };

@@ -1,13 +1,14 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-const dotenv = require('dotenv');
-const swaggerUi = require('swagger-ui-express');
-const { swaggerSpec } = require('./app/api/docs/swagger');
-const { logger } = require('./app/shared/logger');
-const { errorHandler } = require('./app/api/middlewares/errorMiddleware');
-const { databaseConnection } = require('./infra/repository/postgres/connection');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './app/api/docs/swagger.js';
+import { logger } from './app/shared/logger.js';
+import { errorHandler } from './app/api/middlewares/errorMiddleware.js';
+import { databaseConnection } from './infra/repository/postgres/connection.js';
+import authRoutes from './app/api/routes/authRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -30,7 +31,7 @@ app.use(cookieParser());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
-app.use('/api/auth', require('./app/api/routes/authRoutes'));
+app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

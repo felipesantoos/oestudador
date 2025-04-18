@@ -1,16 +1,16 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
-const { User } = require('../domains/userDomain');
-const { AppError } = require('../../app/api/middlewares/errorMiddleware');
-const { userRepository } = require('../../infra/repository/postgres/userRepository');
-const { emailService } = require('./emailService');
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
+import { User } from '../domains/userDomain.js';
+import { AppError } from '../../app/api/middlewares/errorMiddleware.js';
+import { userRepository } from '../../infra/repository/postgres/userRepository.js';
+import { emailService } from './emailService.js';
 
 /**
  * Register a new user
  */
-const registerUserService = async (userData) => {
+export const registerUserService = async (userData) => {
   // Check if email already exists
   const emailExists = await userRepository.emailExists(userData.email);
   if (emailExists) {
@@ -55,7 +55,7 @@ const registerUserService = async (userData) => {
 /**
  * Verify user email
  */
-const verifyEmailService = async (token) => {
+export const verifyEmailService = async (token) => {
   // Find user by verification token
   const user = await userRepository.findByEmailVerificationToken(token);
   
@@ -86,7 +86,7 @@ const verifyEmailService = async (token) => {
 /**
  * Resend verification email
  */
-const resendVerificationEmailService = async (email) => {
+export const resendVerificationEmailService = async (email) => {
   // Find user by email
   const user = await userRepository.findByEmail(email);
   
@@ -126,7 +126,7 @@ const resendVerificationEmailService = async (email) => {
 /**
  * Login user
  */
-const loginUserService = async (email, password, rememberMe = false) => {
+export const loginUserService = async (email, password, rememberMe = false) => {
   // Find user by email
   const user = await userRepository.findByEmail(email);
   
@@ -233,7 +233,7 @@ const generateRefreshToken = (userId) => {
 /**
  * Refresh token
  */
-const refreshTokenService = async (refreshToken) => {
+export const refreshTokenService = async (refreshToken) => {
   try {
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
@@ -292,7 +292,7 @@ const refreshTokenService = async (refreshToken) => {
 /**
  * Forgot password service
  */
-const forgotPasswordService = async (email) => {
+export const forgotPasswordService = async (email) => {
   // Find user by email
   const user = await userRepository.findByEmail(email);
   
@@ -328,7 +328,7 @@ const forgotPasswordService = async (email) => {
 /**
  * Reset password service
  */
-const resetPasswordService = async (token, newPassword) => {
+export const resetPasswordService = async (token, newPassword) => {
   // Find user by reset token
   const user = await userRepository.findByPasswordResetToken(token);
   
@@ -359,7 +359,7 @@ const resetPasswordService = async (token, newPassword) => {
 /**
  * Change password service (authenticated)
  */
-const changePasswordService = async (userId, currentPassword, newPassword) => {
+export const changePasswordService = async (userId, currentPassword, newPassword) => {
   // Find user by ID
   const user = await userRepository.findById(userId);
   
@@ -390,7 +390,7 @@ const changePasswordService = async (userId, currentPassword, newPassword) => {
 /**
  * Get user by ID service
  */
-const getUserByIdService = async (userId) => {
+export const getUserByIdService = async (userId) => {
   const user = await userRepository.findById(userId);
   return user;
 };
@@ -398,7 +398,7 @@ const getUserByIdService = async (userId) => {
 /**
  * Invalidate token service
  */
-const invalidateTokenService = async (refreshToken) => {
+export const invalidateTokenService = async (refreshToken) => {
   try {
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
@@ -431,25 +431,11 @@ const invalidateTokenService = async (refreshToken) => {
 /**
  * Invalidate all tokens service
  */
-const invalidateAllTokensService = async (userId) => {
+export const invalidateAllTokensService = async (userId) => {
   await userRepository.updateUser(userId, {
     session_token: null,
     updated_at: new Date()
   });
   
   return true;
-};
-
-module.exports = {
-  registerUserService,
-  verifyEmailService,
-  resendVerificationEmailService,
-  loginUserService,
-  refreshTokenService,
-  forgotPasswordService,
-  resetPasswordService,
-  changePasswordService,
-  getUserByIdService,
-  invalidateTokenService,
-  invalidateAllTokensService
 };

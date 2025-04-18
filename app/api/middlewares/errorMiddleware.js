@@ -1,6 +1,6 @@
-const { logger } = require('../../shared/logger');
+import { logger } from '../../shared/logger.js';
 
-class AppError extends Error {
+export class AppError extends Error {
   constructor(message, statusCode, errorCode) {
     super(message);
     this.statusCode = statusCode;
@@ -10,7 +10,7 @@ class AppError extends Error {
   }
 }
 
-const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, req, res, next) => {
   // Log the error
   logger.error({
     message: err.message,
@@ -73,9 +73,4 @@ const errorHandler = (err, req, res, next) => {
       ? 'Something went wrong' 
       : err.message
   });
-};
-
-module.exports = { 
-  AppError,
-  errorHandler
 };

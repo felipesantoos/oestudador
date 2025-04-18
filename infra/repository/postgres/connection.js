@@ -1,5 +1,7 @@
-const { Pool } = require('pg');
-const { logger } = require('../../../app/shared/logger');
+import pg from 'pg';
+import { logger } from '../../../app/shared/logger.js';
+
+const { Pool } = pg;
 
 /**
  * PostgreSQL database connection
@@ -105,6 +107,4 @@ class DatabaseConnection {
   }
 }
 
-const databaseConnection = new DatabaseConnection();
-
-module.exports = { databaseConnection };
+export const databaseConnection = new DatabaseConnection();

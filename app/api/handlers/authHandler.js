@@ -1,20 +1,20 @@
-const { AppError } = require('../middlewares/errorMiddleware');
-const {
+import { AppError } from '../middlewares/errorMiddleware.js';
+import {
   registerUserService,
-  loginUserService,
   verifyEmailService,
   resendVerificationEmailService,
+  loginUserService,
+  refreshTokenService,
   forgotPasswordService,
   resetPasswordService,
   changePasswordService,
   getUserByIdService,
   invalidateTokenService,
-  invalidateAllTokensService,
-  refreshTokenService
-} = require('../../../core/services/authService');
+  invalidateAllTokensService
+} from '../../../core/services/authService.js';
 
 // Register a new user
-const register = async (req, res, next) => {
+export const register = async (req, res, next) => {
   try {
     const { name, email, password, timezone, language, birthDate } = req.body;
     
@@ -48,7 +48,7 @@ const register = async (req, res, next) => {
 };
 
 // Verify email address
-const verifyEmail = async (req, res, next) => {
+export const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.params;
     
@@ -64,7 +64,7 @@ const verifyEmail = async (req, res, next) => {
 };
 
 // Resend verification email
-const resendVerification = async (req, res, next) => {
+export const resendVerification = async (req, res, next) => {
   try {
     const { email } = req.body;
     
@@ -81,7 +81,7 @@ const resendVerification = async (req, res, next) => {
 };
 
 // Login user
-const login = async (req, res, next) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password, rememberMe = false } = req.body;
     
@@ -126,7 +126,7 @@ const login = async (req, res, next) => {
 };
 
 // Logout user
-const logout = async (req, res, next) => {
+export const logout = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     
@@ -149,7 +149,7 @@ const logout = async (req, res, next) => {
 };
 
 // Refresh token
-const refreshToken = async (req, res, next) => {
+export const refreshToken = async (req, res, next) => {
   try {
     const token = req.cookies.refreshToken;
     
@@ -193,7 +193,7 @@ const refreshToken = async (req, res, next) => {
 };
 
 // Forgot password
-const forgotPassword = async (req, res, next) => {
+export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     
@@ -210,7 +210,7 @@ const forgotPassword = async (req, res, next) => {
 };
 
 // Reset password
-const resetPassword = async (req, res, next) => {
+export const resetPassword = async (req, res, next) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
@@ -228,7 +228,7 @@ const resetPassword = async (req, res, next) => {
 };
 
 // Change password (authenticated)
-const changePassword = async (req, res, next) => {
+export const changePassword = async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
@@ -246,7 +246,7 @@ const changePassword = async (req, res, next) => {
 };
 
 // Get current user
-const getCurrentUser = async (req, res, next) => {
+export const getCurrentUser = async (req, res, next) => {
   try {
     return res.status(200).json({
       status: 'success',
@@ -270,7 +270,7 @@ const getCurrentUser = async (req, res, next) => {
 };
 
 // Logout from all devices
-const logoutAll = async (req, res, next) => {
+export const logoutAll = async (req, res, next) => {
   try {
     const userId = req.user.id;
     
@@ -288,18 +288,4 @@ const logoutAll = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-module.exports = {
-  register,
-  verifyEmail,
-  resendVerification,
-  login,
-  logout,
-  refreshToken,
-  forgotPassword,
-  resetPassword,
-  changePassword,
-  getCurrentUser,
-  logoutAll
 };

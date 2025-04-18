@@ -1,9 +1,9 @@
-const express = require('express');
-const { body } = require('express-validator');
-const authHandler = require('../handlers/authHandler');
-const { validateRequest } = require('../middlewares/validationMiddleware');
-const { authenticate } = require('../middlewares/authMiddleware');
-const { rateLimiter } = require('../middlewares/rateLimiterMiddleware');
+import express from 'express';
+import { body } from 'express-validator';
+import * as authHandler from '../handlers/authHandler.js';
+import { validateRequest } from '../middlewares/validationMiddleware.js';
+import { authenticate } from '../middlewares/authMiddleware.js';
+import { rateLimiter } from '../middlewares/rateLimiterMiddleware.js';
 
 const router = express.Router();
 
@@ -369,4 +369,4 @@ router.get('/me', authenticate, authHandler.getCurrentUser);
  */
 router.post('/logout-all', authenticate, authHandler.logoutAll);
 
-module.exports = router;
+export default router;

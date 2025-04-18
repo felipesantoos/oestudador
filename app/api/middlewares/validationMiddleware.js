@@ -1,8 +1,7 @@
-const { validationResult } = require('express-validator');
-const { AppError } = require('./errorMiddleware');
+import { validationResult } from 'express-validator';
+import { AppError } from './errorMiddleware.js';
 
-// Validate request based on express-validator rules
-const validateRequest = (req, res, next) => {
+export const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   
   if (!errors.isEmpty()) {
@@ -24,5 +23,3 @@ const validateRequest = (req, res, next) => {
   
   next();
 };
-
-module.exports = { validateRequest };

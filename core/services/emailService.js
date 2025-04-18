@@ -1,5 +1,5 @@
-const nodemailer = require('nodemailer');
-const { logger } = require('../../app/shared/logger');
+import nodemailer from 'nodemailer';
+import { logger } from '../../app/shared/logger.js';
 
 /**
  * Email service for sending transactional emails
@@ -137,6 +137,4 @@ class EmailService {
   }
 }
 
-const emailService = new EmailService();
-
-module.exports = { emailService };
+export const emailService = new EmailService();
