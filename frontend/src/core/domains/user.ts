@@ -1,23 +1,29 @@
 export interface User {
   id: string;
-  name: string;
   email: string;
-  role: 'student' | 'admin' | 'moderator';
-  isEmailVerified: boolean;
-  timezone: string;
-  language: string;
-  avatarUrl?: string;
+  name: string;
+  role: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface AuthResponse {
-  status: string;
-  message: string;
   data: {
     user: User;
-    accessToken?: string;
+    token: string;
   };
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export interface PasswordResetRequest {
