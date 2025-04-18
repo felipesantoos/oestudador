@@ -3,6 +3,7 @@ import { User } from '../core/domain/entities/user';
 import { AuthService } from '../adapters/secondary/services/authService';
 import { UserRepository } from '../adapters/secondary/repositories/userRepository';
 import { AuthUseCase } from '../core/usecases/auth';
+import { toast } from 'react-hot-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -46,11 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return true;
       }
       
-      setError('Invalid credentials');
-      setIsLoading(false);
-      return false;
+      throw new Error('Invalid credentials');
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred during login');
+      const message = error instanceof Error ? error.message : 'An error occurred during login';
+      setError(message);
+      toast.error(message);
       setIsLoading(false);
       return false;
     }
@@ -66,7 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred during registration');
+      const message = error instanceof Error ? error.message : 'An error occurred during registration';
+      setError(message);
+      toast.error(message);
       setIsLoading(false);
       return false;
     }
@@ -91,7 +94,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(false);
       setIsLoading(false);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to logout from all devices');
+      const message = error instanceof Error ? error.message : 'Failed to logout from all devices';
+      setError(message);
+      toast.error(message);
       setIsLoading(false);
     }
   }, []);
@@ -104,7 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(!!user);
       setIsLoading(false);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to fetch user');
+      const message = error instanceof Error ? error.message : 'Failed to fetch user';
+      setError(message);
       setIsLoading(false);
     }
   }, []);
@@ -117,7 +123,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to reset password');
+      const message = error instanceof Error ? error.message : 'Failed to reset password';
+      setError(message);
+      toast.error(message);
       setIsLoading(false);
       return false;
     }
@@ -131,7 +139,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to update password');
+      const message = error instanceof Error ? error.message : 'Failed to update password';
+      setError(message);
+      toast.error(message);
       setIsLoading(false);
       return false;
     }
@@ -145,7 +155,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to change password');
+      const message = error instanceof Error ? error.message : 'Failed to change password';
+      setError(message);
+      toast.error(message);
       setIsLoading(false);
       return false;
     }
@@ -160,7 +172,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to update profile');
+      const message = error instanceof Error ? error.message : 'Failed to update profile';
+      setError(message);
+      toast.error(message);
       setIsLoading(false);
       return false;
     }

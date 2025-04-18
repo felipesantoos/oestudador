@@ -4,31 +4,31 @@ import { User, AuthUser } from '../../../types';
 export class AuthService {
   async login(email: string, password: string): Promise<AuthUser | null> {
     try {
-      const response = await apiClient.post<{ user: AuthUser; token: string }>('/auth/login', { 
+      const response = await apiClient.post<{ data: { user: AuthUser; accessToken: string } }>('/auth/login', { 
         email, 
         password 
       });
       
-      if (response.token) {
-        localStorage.setItem('auth_token', response.token);
+      if (response.data.accessToken) {
+        localStorage.setItem('auth_token', response.data.accessToken);
       }
       
-      return response.user || null;
+      return response.data.user;
     } catch (error) {
       console.error('Login error:', error);
-      return null;
+      throw error;
     }
   }
 
   async register(userData: Omit<User, 'id' | 'role' | 'isEmailVerified' | 'createdAt' | 'updatedAt'>): Promise<User> {
     try {
-      const response = await apiClient.post<{ user: User; token: string }>('/auth/register', userData);
+      const response = await apiClient.post<{ data: { user: User; accessToken: string } }>('/auth/register', userData);
       
-      if (response.token) {
-        localStorage.setItem('auth_token', response.token);
+      if (response.data.accessToken) {
+        localStorage.setItem('auth_token', response.data.accessToken);
       }
       
-      return response.user;
+      return response.data.user;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -37,7 +37,8 @@ export class AuthService {
 
   async getCurrentUser(): Promise<User | null> {
     try {
-      return await apiClient.get<User>('/auth/me');
+      const response = await apiClient.get<{ data: { user: User } }>('/auth/me');
+      return response.data.user;
     } catch (error) {
       console.error('Get current user error:', error);
       return null;
@@ -60,7 +61,7 @@ export class AuthService {
       return true;
     } catch (error) {
       console.error('Reset password error:', error);
-      return false;
+      throw error;
     }
   }
 
@@ -70,7 +71,7 @@ export class AuthService {
       return true;
     } catch (error) {
       console.error('Update password error:', error);
-      return false;
+      throw error;
     }
   }
 
@@ -83,7 +84,7 @@ export class AuthService {
       return true;
     } catch (error) {
       console.error('Change password error:', error);
-      return false;
+      throw error;
     }
   }
 }
