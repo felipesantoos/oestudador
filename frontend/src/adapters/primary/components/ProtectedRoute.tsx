@@ -1,36 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../../state/authStore';
+import { useAuth } from '../../../contexts/AuthContext';
 
-interface ProtectedRouteProps {
+interface Props {
   children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, user, fetchCurrentUser, isLoading } = useAuthStore();
-  const location = useLocation();
+const ProtectedRoute: React.FC<Props> = ({ children }) => {
+  const { isAuthenticated, user, fetchCurrentUser, isLoading } = useAuth();
   const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    // Only attempt to fetch if we haven't tried yet and we're not authenticated
-    if (!isAuthenticated && !isLoading && !user && !hasAttemptedFetch) {
-      setHasAttemptedFetch(true);
-      fetchCurrentUser().catch(error => {
-        console.error('Error fetching current user:', error);
-        // Don't set hasAttemptedFetch to false here to prevent infinite retries
-      });
-    }
-  }, [isAuthenticated, fetchCurrentUser, isLoading, user, hasAttemptedFetch]);
+    const checkAuth = async () => {
+      if (!isAuthenticated && !isLoading && !hasAttemptedFetch) {
+        try {
+          await fetchCurrentUser();
+        } catch (error) {
+          console.error('Failed to fetch user:', error);
+        } finally {
+          setHasAttemptedFetch(true);
+        }
+      }
+    };
+    checkAuth();
+  }, [isAuthenticated, isLoading, hasAttemptedFetch, fetchCurrentUser]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
-  
-  if (!isAuthenticated && !isLoading) {
+
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MenuIcon, X, BookOpen, LogOut, User, Settings } from 'lucide-react';
-import { useAuthStore } from '../../../state/authStore';
+import { useAuth } from '../../../../contexts/AuthContext';
 import Button from '../ui/Button';
 
 const Navbar: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const navigate = useNavigate();
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -20,6 +21,7 @@ const Navbar: React.FC = () => {
   const handleLogout = async () => {
     await logout();
     setIsProfileMenuOpen(false);
+    navigate('/login');
   };
 
   return (
@@ -64,7 +66,7 @@ const Navbar: React.FC = () => {
           </div>
           
           <div className="flex items-center">
-            {isAuthenticated ? (
+            {user ? (
               <div className="ml-3 relative">
                 <div>
                   <button
@@ -198,7 +200,7 @@ const Navbar: React.FC = () => {
               Analytics
             </Link>
             
-            {!isAuthenticated && (
+            {!user && (
               <div className="pt-4 pb-3 border-t border-gray-200">
                 <div className="flex items-center justify-center space-x-3 px-4">
                   <Link to="/login" className="w-full" onClick={() => setIsMenuOpen(false)}>
@@ -216,7 +218,7 @@ const Navbar: React.FC = () => {
             )}
           </div>
           
-          {isAuthenticated && (
+          {user && (
             <div className="pt-4 pb-3 border-t border-gray-200">
               <div className="flex items-center px-4">
                 {user?.avatarUrl ? (

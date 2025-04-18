@@ -1,160 +1,149 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
-import { useAuthStore } from '../../../state/authStore';
+import { useAuth } from '../../../../contexts/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
-  timezone: z.string().min(1, 'Timezone is required'),
-  language: z.string().min(1, 'Language is required')
-}).refine(data => data.password === data.confirmPassword, {
+}).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
-  path: ['confirmPassword']
+  path: ['confirmPassword'],
 });
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
+type RegisterFormData = z.infer<typeof registerSchema>;
 
-interface RegisterFormProps {
-  onSuccess?: () => void;
-}
-
-const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
-  const { register: registerUser, isLoading, error } = useAuthStore();
+const RegisterForm: React.FC = () => {
+  const { register: registerUser } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  
-  const { 
-    register, 
-    handleSubmit, 
-    formState: { errors } 
-  } = useForm<RegisterFormValues>();
-  
-  const onSubmit = async (data: RegisterFormValues) => {
-    const { confirmPassword, ...userData } = data;
-    
-    const success = await registerUser({
-      ...userData,
-      avatarUrl: undefined,
-      birthDate: undefined,
-      notificationsEnabled: true
-    });
-    
-    if (success && onSuccess) {
-      onSuccess();
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      setError(null);
+      const { confirmPassword, ...userData } = data;
+      await registerUser({
+        ...userData,
+        notificationsEnabled: true
+      });
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred during registration');
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="space-y-4">
-        <Input
-          label="Name"
-          fullWidth
-          error={errors.name?.message}
-          {...register('name', { 
-            required: 'Name is required'
-          })}
-        />
-        
-        <Input
-          label="Email"
-          type="email"
-          fullWidth
-          error={errors.email?.message}
-          {...register('email', { 
-            required: 'Email is required'
-          })}
-        />
-        
-        <div className="relative">
-          <Input
-            label="Password"
-            type={showPassword ? 'text' : 'password'}
-            fullWidth
-            error={errors.password?.message}
-            {...register('password', { 
-              required: 'Password is required'
-            })}
-          />
-          <button
-            type="button"
-            className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
-        
-        <Input
-          label="Confirm Password"
-          type={showPassword ? 'text' : 'password'}
-          fullWidth
-          error={errors.confirmPassword?.message}
-          {...register('confirmPassword', { 
-            required: 'Please confirm your password'
-          })}
-        />
-
-        <div className="w-full">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Language
-          </label>
-          <select
-            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            {...register('language', { 
-              required: 'Language is required'
-            })}
-          >
-            <option value="">Select a language</option>
-            <option value="en">English</option>
-            <option value="pt">Portuguese</option>
-            <option value="es">Spanish</option>
-          </select>
-          {errors.language && (
-            <p className="mt-1 text-sm text-red-600">{errors.language.message}</p>
-          )}
-        </div>
-
-        <div className="w-full">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Timezone
-          </label>
-          <select
-            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            {...register('timezone', { 
-              required: 'Timezone is required'
-            })}
-          >
-            <option value="">Select a timezone</option>
-            <option value="America/Sao_Paulo">America/Sao Paulo (UTC-3)</option>
-            <option value="America/New_York">America/New York (UTC-4)</option>
-            <option value="Europe/London">Europe/London (UTC+1)</option>
-            <option value="Europe/Paris">Europe/Paris (UTC+2)</option>
-          </select>
-          {errors.timezone && (
-            <p className="mt-1 text-sm text-red-600">{errors.timezone.message}</p>
-          )}
-        </div>
-      </div>
-      
       {error && (
-        <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
           {error}
         </div>
       )}
-      
-      <Button 
-        type="submit" 
-        fullWidth
-        isLoading={isLoading}
-      >
-        Create Account
-      </Button>
+
+      <div>
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          Name
+        </label>
+        <div className="mt-1">
+          <Input
+            id="name"
+            type="text"
+            autoComplete="name"
+            {...register('name')}
+            error={errors.name?.message}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Email address
+        </label>
+        <div className="mt-1">
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            {...register('email')}
+            error={errors.email?.message}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          Password
+        </label>
+        <div className="mt-1 relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            {...register('password')}
+            error={errors.password?.message}
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Eye className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+          Confirm Password
+        </label>
+        <div className="mt-1 relative">
+          <Input
+            id="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            {...register('confirmPassword')}
+            error={errors.confirmPassword?.message}
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? (
+              <EyeOff className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Eye className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <Button type="submit" fullWidth disabled={isSubmitting}>
+          {isSubmitting ? 'Registering...' : 'Register'}
+        </Button>
+      </div>
     </form>
   );
 };

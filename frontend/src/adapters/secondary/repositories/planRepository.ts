@@ -1,46 +1,32 @@
 import { Plan, PlanWithRelations } from '../../../core/domain/entities/plan';
-import { PlanRepository } from '../../../core/ports/repositories';
-import { httpClient } from '../api/httpClient';
+import { apiClient } from '../../../lib/axios';
 
-export class ApiPlanRepository implements PlanRepository {
-  async findAll(): Promise<Plan[]> {
-    return httpClient.get<Plan[]>('/plans');
+export class PlanRepository {
+  async getAll(): Promise<Plan[]> {
+    return apiClient.get<Plan[]>('/plans');
   }
 
-  async findById(id: string): Promise<Plan | null> {
-    try {
-      return await httpClient.get<Plan>(`/plans/${id}`);
-    } catch (error) {
-      return null;
-    }
+  async getById(id: string): Promise<Plan> {
+    return await apiClient.get<Plan>(`/plans/${id}`);
   }
 
-  async findByUserId(userId: string): Promise<Plan[]> {
-    return httpClient.get<Plan[]>(`/plans?userId=${userId}`);
+  async getByUserId(userId: string): Promise<Plan[]> {
+    return apiClient.get<Plan[]>(`/plans?userId=${userId}`);
   }
 
-  async findWithRelations(id: string): Promise<PlanWithRelations | null> {
-    try {
-      return await httpClient.get<PlanWithRelations>(`/plans/${id}?_expand=objective&_expand=planStatus&_embed=disciplines&_embed=topics`);
-    } catch (error) {
-      return null;
-    }
+  async getByIdWithRelations(id: string): Promise<PlanWithRelations> {
+    return await apiClient.get<PlanWithRelations>(`/plans/${id}?_expand=objective&_expand=planStatus&_embed=disciplines&_embed=topics`);
   }
 
-  async create(data: Omit<Plan, 'id' | 'createdAt' | 'updatedAt'>): Promise<Plan> {
-    return httpClient.post<Plan>('/plans', data);
+  async create(data: Partial<Plan>): Promise<Plan> {
+    return apiClient.post<Plan>('/plans', data);
   }
 
   async update(id: string, data: Partial<Plan>): Promise<Plan> {
-    return httpClient.patch<Plan>(`/plans/${id}`, data);
+    return apiClient.patch<Plan>(`/plans/${id}`, data);
   }
 
-  async delete(id: string): Promise<boolean> {
-    try {
-      await httpClient.delete(`/plans/${id}`);
-      return true;
-    } catch (error) {
-      return false;
-    }
+  async delete(id: string): Promise<void> {
+    await apiClient.delete(`/plans/${id}`);
   }
 }
