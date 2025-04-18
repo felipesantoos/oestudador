@@ -10,7 +10,9 @@ const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string()
+  confirmPassword: z.string(),
+  timezone: z.string().min(1, 'Timezone is required'),
+  language: z.string().min(1, 'Language is required')
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword']
@@ -39,8 +41,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       ...userData,
       avatarUrl: undefined,
       birthDate: undefined,
-      language: undefined,
-      timezone: undefined,
       notificationsEnabled: true
     });
     
@@ -99,6 +99,47 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             required: 'Please confirm your password'
           })}
         />
+
+        <div className="w-full">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Language
+          </label>
+          <select
+            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            {...register('language', { 
+              required: 'Language is required'
+            })}
+          >
+            <option value="">Select a language</option>
+            <option value="en">English</option>
+            <option value="pt">Portuguese</option>
+            <option value="es">Spanish</option>
+          </select>
+          {errors.language && (
+            <p className="mt-1 text-sm text-red-600">{errors.language.message}</p>
+          )}
+        </div>
+
+        <div className="w-full">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Timezone
+          </label>
+          <select
+            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            {...register('timezone', { 
+              required: 'Timezone is required'
+            })}
+          >
+            <option value="">Select a timezone</option>
+            <option value="America/Sao_Paulo">America/Sao Paulo (UTC-3)</option>
+            <option value="America/New_York">America/New York (UTC-4)</option>
+            <option value="Europe/London">Europe/London (UTC+1)</option>
+            <option value="Europe/Paris">Europe/Paris (UTC+2)</option>
+          </select>
+          {errors.timezone && (
+            <p className="mt-1 text-sm text-red-600">{errors.timezone.message}</p>
+          )}
+        </div>
       </div>
       
       {error && (
